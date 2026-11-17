@@ -1608,8 +1608,13 @@
             selectedDayIndex: initialDayIndex
         };
 
+        // Lunedì 2 novembre 2026 = 1ª settimana di riferimento del ciclo
+        const CYCLE_ANCHOR_MONDAY = new Date(2026, 10, 2);
+
         function getMenuWeekNumber(offset) {
-            return (((1 + offset) % 4) + 4) % 4 + 1;
+            const targetMonday = getDateForSlot(offset, 0);
+            const diffWeeks = Math.round((targetMonday - CYCLE_ANCHOR_MONDAY) / (7 * 86400000));
+            return (((diffWeeks % 4) + 4) % 4) + 1;
         }
 
         function getDateForSlot(weekOffset, dayIndex) {
