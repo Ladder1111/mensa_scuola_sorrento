@@ -1,0 +1,32 @@
+{
+    "description":  "Menù della mensa scolastica di Sorrento: calendario e porzioni.",
+    "short_name":  "Mensa Sorrento",
+    "background_color":  "#FFF9F1",
+    "icons":  [
+                  {
+                      "purpose":  "any",
+                      "type":  "image/png",
+                      "sizes":  "192x192",
+                      "src":  "icon-192.png"
+                  },
+                  {
+                      "purpose":  "any",
+                      "type":  "image/png",
+                      "sizes":  "512x512",
+                      "src":  "icon-512.png"
+                  },
+                  {
+                      "purpose":  "maskable",
+                      "type":  "image/png",
+                      "sizes":  "512x512",
+                      "src":  "icon-512.png"
+                  }
+              ],
+    "lang":  "it",
+    "orientation":  "portrait",
+    "theme_color":  "#FFF9F1",
+    "display":  "standalone",
+    "name":  "Mensa Scolastica Sorrento",
+    "scope":  "./",
+    "start_url":  "./"
+}

@@ -1,0 +1,2783 @@
+<!DOCTYPE html>
+<html lang="it" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#FFFBF0">
+    <meta name="description" content="Menù della mensa scolastica di Sorrento: consulta il calendario e le porzioni.">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Mensa Sorrento">
+    
+    <title>Mensa Scolastica Sorrento • Material You</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Rounded -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        md: {
+                            bg: 'var(--md-bg)',
+                            surface: 'var(--md-surface)',
+                            surfaceContainer: 'var(--md-surface-container)',
+                            surfaceHigh: 'var(--md-surface-high)',
+                            primary: 'var(--md-primary)',
+                            onPrimary: 'var(--md-on-primary)',
+                            primaryContainer: 'var(--md-primary-container)',
+                            onPrimaryContainer: 'var(--md-on-primary-container)',
+                            secondaryContainer: 'var(--md-secondary-container)',
+                            onSecondaryContainer: 'var(--md-on-secondary-container)',
+                            tertiaryContainer: 'var(--md-tertiary-container)',
+                            onTertiaryContainer: 'var(--md-on-tertiary-container)',
+                            outline: 'var(--md-outline)',
+                            textMain: 'var(--md-text-main)',
+                            textSub: 'var(--md-text-sub)',
+                        }
+                    },
+                    borderRadius: {
+                        '3xl': '24px',
+                        '4xl': '28px',
+                        'pill': '9999px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Material Design 3 Dynamic Color Tokens (Pixel Organic Green Palette) */
+        :root {
+            --md-bg: #FFF9F1;
+            --md-surface: #FFFFFF;
+            --md-surface-container: #FFF0DE;
+            --md-surface-high: #FFE3C4;
+            --md-primary: #D95A00;
+            --md-on-primary: #FFFFFF;
+            --md-primary-container: #FFDDBA;
+            --md-on-primary-container: #4A2000;
+            --md-secondary-container: #FFEACC;
+            --md-on-secondary-container: #4A2D00;
+            --md-tertiary-container: #FFE3C4;
+            --md-on-tertiary-container: #4A2000;
+            --md-outline: #8C7F66;
+            --md-text-main: #2B2418;
+            --md-text-sub: #5E5440;
+        }
+        h1, h2, h3, h4, .font-display { font-family: 'Fredoka', 'Nunito', sans-serif; letter-spacing: 0; }
+        header { padding-top: env(safe-area-inset-top); }
+
+        /* Home: Oggi / Domani / resto settimana */
+        .home-label { display: flex; align-items: center; gap: 8px; margin: 0 4px 10px; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 18px; color: var(--md-text-main); }
+        .home-label small { font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--md-text-sub); }
+        .hcard { position: relative; overflow: hidden; border-radius: 28px; padding: 16px 18px; width: 100%; text-align: left; display: block; transition: transform 0.3s var(--ease-spring), box-shadow 0.25s ease; }
+        .hcard:active { transform: scale(0.985); }
+        .hcard.today { background: var(--md-surface); border: 2px solid #FF9E4A; box-shadow: 0 10px 24px -16px rgba(217,90,0,0.55); }
+        .hcard.tomorrow { background: var(--md-surface); border: 1.5px solid #F1E4D3; }
+        .hcard.closed { background: #FEF3C7; color: #78350F; }
+        .hcard.rest { background: var(--md-surface-container); }
+        .hday { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; margin-bottom: 12px; position: relative; }
+        .hchip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 9999px; font-size: 12px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
+        .hdate { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 16px; text-transform: capitalize; opacity: 0.85; }
+        .hdish { display: flex; align-items: center; gap: 12px; padding: 8px 0; position: relative; }
+        .hdish + .hdish { border-top: 1px solid rgba(0,0,0,0.07); }
+        .hdish .ico { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .hdish .ico .material-symbols-rounded { font-size: 26px; }
+        .hdish small { display: block; font-size: 11px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.65; }
+        .hdish b { display: block; font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 19px; line-height: 1.2; }
+        .hcard.tomorrow .hdish b { font-size: 17px; }
+        .ic-primo { background: #FFF1C7; color: #C77700; } .ic-secondo { background: #FFE0E3; color: #D6335A; } .ic-contorno { background: #DDF6D9; color: #1B8A3A; }
+        
+        .hmore { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 8px; font-size: 13px; font-weight: 800; opacity: 0.75; position: relative; }
+        .rrow { display: flex; gap: 12px; align-items: stretch; width: 100%; text-align: left; padding: 10px 12px 10px 10px; border-radius: 22px; background: var(--md-surface); border: 1px solid #FFE3C4; transition: transform 0.3s var(--ease-spring); }
+        .rrow:active { transform: scale(0.985); }
+        .rrow .dbox { width: 54px; flex-shrink: 0; border-radius: 16px; background: var(--md-primary-container); color: var(--md-on-primary-container); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; }
+        .rrow .dbox span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+        .rrow .dbox b { font-family: 'Fredoka', sans-serif; font-size: 24px; line-height: 1; font-weight: 600; }
+        .rrow ul { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+        .rrow li { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; line-height: 1.25; }
+        .rrow li .material-symbols-rounded { font-size: 20px; flex-shrink: 0; }
+        .rrow li.p .material-symbols-rounded { color: #C77700; } .rrow li.s .material-symbols-rounded { color: #D6335A; } .rrow li.c .material-symbols-rounded { color: #1B8A3A; }
+        .rrow.closed { background: #FEF3C7; color: #78350F; }
+        #weekViewSection, #dayPager, #heroSchoolBadge, #heroTodayBadge { display: none !important; }
+        #heroDayCard button[onclick^="stepDay"] { display: none !important; }
+        .hcard.today .hdate::after, .hcard.tomorrow .hdate::after { content: '›'; margin-left: 8px; font-size: 24px; font-weight: 700; line-height: 0; color: var(--md-primary); }
+        .hcard.today .hdish .ico { width: 50px; height: 50px; } .hcard.today .hdish b { font-size: 22px; }
+        .hcard.tomorrow .hdish { padding: 5px 0; } .hcard.tomorrow .hdish .ico { width: 38px; height: 38px; border-radius: 12px; } .hcard.tomorrow .hdish .ico .material-symbols-rounded { font-size: 22px; } .hcard.tomorrow .hdish b { font-size: 16px; } .hcard.tomorrow .hdish small { font-size: 10px; }
+        /* Animazioni calme: solo dissolvenza, niente rimbalzi */
+        :root { --ease-spring: cubic-bezier(0.2, 0, 0, 1); }
+        @keyframes calmFade { from { opacity: 0; } to { opacity: 1; } }
+        .anim-rise, .anim-in-right, .anim-in-left, .anim-pop, .icon-pop, .animate-m3 { animation: calmFade 0.18s ease both !important; animation-delay: 0ms !important; }
+        ::view-transition-old(root), html.vt-back::view-transition-old(root) { animation: calmFadeOut 0.12s ease both !important; }
+        ::view-transition-new(root), html.vt-back::view-transition-new(root) { animation: calmFade 0.18s ease both !important; }
+        @keyframes calmFadeOut { to { opacity: 0; } }
+        .wiggle { animation: none !important; }
+        .day-card:hover, #dayStripContainer button:hover, .hcard:active, .rrow:active { transform: none !important; }
+        #searchInput { font-size: 16px !important; }
+        #searchInput, #searchInput:focus, #searchInput:focus-visible { outline: none !important; box-shadow: none !important; -webkit-appearance: none; appearance: none; }
+        #searchInput::-webkit-search-cancel-button { display: none; }
+        .today-ring { box-shadow: inset 0 0 0 2px var(--md-primary); }
+
+        /* Playful touches */
+        .wiggle { animation: wiggle 3.2s ease-in-out infinite; transform-origin: 50% 80%; }
+        @keyframes wiggle { 0%, 88%, 100% { transform: rotate(0); } 91% { transform: rotate(-10deg); } 94% { transform: rotate(9deg); } 97% { transform: rotate(-5deg); } }
+        .dish-card { background: var(--md-surface); border: 1.5px solid #FFE3C4; }
+        .dish-card details > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; min-height: 44px; padding: 0 4px; font-size: 13px; font-weight: 800; color: var(--md-text-sub); }
+        .dish-card details > summary::-webkit-details-marker { display: none; }
+        .dish-card details[open] > summary .mi-chev { transform: rotate(180deg); }
+        .mi-chev { transition: transform 0.3s var(--ease-spring); }
+
+        html.dark {
+            --md-bg: #101510;
+            --md-surface: #181D18;
+            --md-surface-container: #202620;
+            --md-surface-high: #2A312A;
+            --md-primary: #8BD79A;
+            --md-on-primary: #003917;
+            --md-primary-container: #005225;
+            --md-on-primary-container: #A6F4B4;
+            --md-secondary-container: #3A4B3B;
+            --md-on-secondary-container: #D4E8D2;
+            --md-tertiary-container: #1F4D53;
+            --md-on-tertiary-container: #BCEBF1;
+            --md-outline: #8C9389;
+            --md-text-main: #E0E4DD;
+            --md-text-sub: #C1C9BE;
+        }
+
+        body {
+            background-color: var(--md-bg);
+            color: var(--md-text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.25s ease, color 0.25s ease;
+            overflow-x: hidden;
+        }
+
+        .material-symbols-rounded {
+            font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+
+        .m3-card {
+            background-color: var(--md-surface);
+            border-radius: 28px;
+            box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease, background-color 0.25s ease;
+        }
+        
+        .m3-btn {
+            transition: all 0.18s cubic-bezier(0.2, 0, 0, 1);
+        }
+        .m3-btn:active {
+            transform: scale(0.96);
+        }
+
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-m3 {
+            animation: fadeInSlide 0.24s cubic-bezier(0.2, 0, 0, 1) forwards;
+        }
+
+        /* ===== Grafica & animazioni ===== */
+        :root { --ease-emph: cubic-bezier(0.2, 0, 0, 1); --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes m3DropIn { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes m3SlideInRight { from { opacity: 0; transform: translateX(40px) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
+        @keyframes m3SlideInLeft  { from { opacity: 0; transform: translateX(-40px) scale(0.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
+        @keyframes m3RiseIn { from { opacity: 0; transform: translateY(30px) scale(0.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes m3PopIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+        @keyframes m3IconPop { 0% { opacity: 0; transform: scale(0) rotate(-40deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+        @keyframes m3BackdropIn  { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes m3BackdropOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes m3SheetUp   { from { opacity: 0; transform: translateY(60px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes m3SheetDown { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(60px) scale(0.96); } }
+        @keyframes m3Blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+        .anim-in-right { animation: m3SlideInRight 0.5s var(--ease-spring) both; }
+        .anim-in-left  { animation: m3SlideInLeft 0.5s var(--ease-spring) both; }
+        .anim-rise     { animation: m3RiseIn 0.6s var(--ease-spring) both; }
+        .anim-pop      { animation: m3PopIn 0.5s var(--ease-spring) both; }
+        .icon-pop      { animation: m3IconPop 0.55s var(--ease-spring) both; }
+        header.intro   { animation: m3DropIn 0.6s var(--ease-emph) both; }
+
+        ::view-transition-old(root) { animation: vtOut 0.28s ease both; }
+        ::view-transition-new(root) { animation: vtIn 0.5s var(--ease-spring) both; }
+        html.vt-back::view-transition-old(root) { animation: vtOutBack 0.28s ease both; }
+        html.vt-back::view-transition-new(root) { animation: vtInBack 0.5s var(--ease-spring) both; }
+        @keyframes vtOut { to { opacity: 0; transform: translateX(-30px) scale(0.97); } }
+        @keyframes vtIn { from { opacity: 0; transform: translateX(46px) scale(0.97); } }
+        @keyframes vtOutBack { to { opacity: 0; transform: translateX(30px) scale(0.97); } }
+        @keyframes vtInBack { from { opacity: 0; transform: translateX(-46px) scale(0.97); } }
+        ::view-transition-group(site-header) { animation-duration: 0s; }
+
+        #settingsSheet.m3-open, #infoModal.m3-open, #calSheet.m3-open, #searchSheet.m3-open, #installSheet.m3-open { animation: m3BackdropIn 0.25s ease both; }
+        #settingsSheet.m3-open > div, #infoModal.m3-open > div, #calSheet.m3-open > div, #searchSheet.m3-open > div, #installSheet.m3-open > div { animation: m3SheetUp 0.5s var(--ease-spring) both; }
+        #settingsSheet.m3-closing, #infoModal.m3-closing, #calSheet.m3-closing, #searchSheet.m3-closing, #installSheet.m3-closing { animation: m3BackdropOut 0.2s ease both; }
+        #settingsSheet.m3-closing > div, #infoModal.m3-closing > div, #calSheet.m3-closing > div, #searchSheet.m3-closing > div, #installSheet.m3-closing > div { animation: m3SheetDown 0.2s ease both; }
+
+        #macroCarbBar, #macroProtBar, #macroFatBar { transition: width 0.9s var(--ease-emph); }
+
+        #btnTop { transition: opacity 0.3s ease, transform 0.45s var(--ease-spring), background-color 0.2s ease; }
+        #btnTop.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        #btnTop:hover { transform: translateY(-4px); }
+        #toast { transition: opacity 0.3s ease, transform 0.4s var(--ease-spring); transform: translate(-50%, 14px); }
+        #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        #heroDayCard { background: var(--md-surface); }
+
+        .day-card { position: relative; overflow: hidden; transition: transform 0.35s var(--ease-spring), box-shadow 0.3s ease, opacity 0.3s ease, background-color 0.25s ease; }
+        .day-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 14px 30px -10px rgba(31,107,54,0.28); }
+        .day-card:active { transform: scale(0.98); }
+        .day-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.3s ease; background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(31,107,54,0.14), transparent 62%); }
+        .day-card:hover::after { opacity: 1; }
+        .day-card .chev { transition: transform 0.3s var(--ease-spring); }
+        .day-card:hover .chev { transform: translateX(6px); }
+        .day-card .material-symbols-rounded:not(.chev) { transition: transform 0.35s var(--ease-spring); }
+        .day-card:hover .material-symbols-rounded:not(.chev) { transform: scale(1.2) rotate(-8deg); }
+        .day-card.today-strong { box-shadow: 0 10px 26px -12px rgba(31,107,54,0.45); }
+        .day-card.today-strong::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 5px; border-radius: 0 6px 6px 0; background: var(--md-primary); }
+        .day-card.tomorrow-soft { background-color: rgba(212,232,210,0.55); border-color: rgba(31,107,54,0.25) !important; }
+        .day-card.day-past { opacity: 0.6; }
+        .day-card.day-past:hover { opacity: 1; }
+        .day-card.day-closed { opacity: 0.8; }
+        .today-dot { width: 8px; height: 8px; border-radius: 9999px; background: currentColor; animation: m3Blink 1.6s ease-in-out infinite; }
+        .closed-chip { display: flex; align-items: center; gap: 6px; width: fit-content; max-width: 100%; margin-bottom: 10px; padding: 6px 12px; border-radius: 9999px; background: #FEF3C7; color: #78350F; font-size: 12px; font-weight: 800; }
+        .closed-chip .material-symbols-rounded { font-size: 16px; flex-shrink: 0; }
+
+        #closedBanner:not(.hidden), #calClosedNote:not(.hidden), #installNote:not(.hidden) { display: flex; }
+        #installBanner:not(.hidden) { display: flex; }
+
+        .install-step { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 20px; background: var(--md-surface-container); font-size: 14px; font-weight: 700; }
+        .install-step .num { width: 28px; height: 28px; border-radius: 9999px; background: var(--md-primary); color: var(--md-on-primary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+        .install-step .material-symbols-rounded { font-size: 22px; color: var(--md-primary); flex-shrink: 0; }
+        .install-step .inline-ico { display: inline-flex; vertical-align: middle; font-size: 20px; margin: 0 2px; }
+
+        #dayStripContainer button { transition: transform 0.3s var(--ease-spring), background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease; }
+        #dayStripContainer button:hover { transform: translateY(-3px); }
+
+        .pager-btn { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 12px 14px; border-radius: 24px; background: var(--md-surface); border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 10px -4px rgba(0,0,0,0.08); text-align: left; transition: transform 0.3s var(--ease-spring), box-shadow 0.25s ease; }
+        .pager-btn.next { flex-direction: row-reverse; text-align: right; }
+        .pager-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 22px -10px rgba(31,107,54,0.35); }
+        .pager-btn .material-symbols-rounded { font-size: 26px; color: var(--md-primary); }
+        .pager-btn small { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--md-text-sub); }
+        .pager-btn b { display: block; font-size: 14px; font-weight: 800; text-transform: capitalize; color: var(--md-text-main); }
+
+        header { transition: box-shadow 0.3s ease, background-color 0.3s ease; }
+        header.scrolled { box-shadow: 0 8px 24px -14px rgba(0,0,0,0.35); }
+        #headerProfileBtn .material-symbols-rounded { transition: transform 0.6s var(--ease-spring); }
+        #headerProfileBtn:hover .material-symbols-rounded { transform: rotate(90deg); }
+        #optDot { animation: m3Blink 1.8s ease-in-out infinite; }
+
+        #calGrid { min-height: 240px; }
+        .cal-cell { width: 100%; min-height: 44px; aspect-ratio: 1 / 1; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--md-text-main); background: transparent; position: relative; }
+        .cal-cell:hover:not(:disabled) { background: var(--md-surface-container); }
+        .cal-cell:disabled { opacity: 0.3; cursor: default; }
+        .cal-cell.in-week { background: var(--md-secondary-container); border-radius: 12px; }
+        .cal-cell.is-closed { background: #FEF3C7; color: #78350F; border-radius: 12px; }
+        .cal-cell.is-closed::after { content: ""; position: absolute; bottom: 6px; width: 5px; height: 5px; border-radius: 9999px; background: #D97706; }
+        .cal-cell.is-selected { background: var(--md-primary) !important; color: var(--md-on-primary) !important; border-radius: 9999px; box-shadow: 0 6px 14px -6px rgba(31,107,54,0.6); }
+        .cal-cell.is-selected::after { background: var(--md-on-primary); }
+        .cal-cell.is-today:not(.is-selected) { box-shadow: inset 0 0 0 2px var(--md-primary); }
+        .cal-cell.pop { animation: m3PopIn 0.4s var(--ease-spring) both; }
+        .cal-legend-dot { width: 10px; height: 10px; border-radius: 4px; background: #FEF3C7; box-shadow: inset 0 0 0 2px #D97706; display: inline-block; flex-shrink: 0; }
+
+        .chip { padding: 8px 14px; min-height: 36px; border-radius: 9999px; background: var(--md-secondary-container); color: var(--md-on-secondary-container); font-size: 13px; font-weight: 800; }
+        .search-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; min-height: 56px; border-radius: 20px; background: var(--md-surface-container); text-align: left; transition: transform 0.25s var(--ease-spring), background-color 0.2s ease; }
+        .search-item:hover { background: var(--md-surface-high); transform: translateX(3px); }
+        .search-item .material-symbols-rounded { font-size: 24px; color: var(--md-primary); }
+        .search-item b { display: block; font-size: 14px; font-weight: 800; }
+        .search-item small { display: block; font-size: 12px; font-weight: 600; color: var(--md-text-sub); }
+
+        .m3-btn { position: relative; overflow: hidden; }
+        button { transition: background-color 0.22s ease, color 0.22s ease, transform 0.2s var(--ease-spring), box-shadow 0.22s ease, opacity 0.2s ease; }
+        button:active { transform: scale(0.94); }
+        .m3-ripple { position: absolute; border-radius: 9999px; background: currentColor; opacity: 0.2; transform: scale(0); pointer-events: none; animation: m3Ripple 0.6s ease-out forwards; }
+        @keyframes m3Ripple { to { transform: scale(1); opacity: 0; } }
+
+        .m3-switch { position: relative; width: 52px; height: 30px; border-radius: 9999px; border: 2px solid var(--md-outline); background: var(--md-surface-high); padding: 0; cursor: pointer; flex-shrink: 0; transition: background-color 0.25s ease, border-color 0.25s ease; }
+        .m3-switch::before { content: ""; position: absolute; inset: -8px -4px; }
+        .m3-switch-knob { position: absolute; top: 50%; left: 5px; width: 14px; height: 14px; border-radius: 9999px; background: var(--md-outline); transform: translateY(-50%); transition: left 0.35s var(--ease-spring), width 0.2s ease, height 0.2s ease, background-color 0.25s ease; }
+        .m3-switch:active .m3-switch-knob { width: 20px; height: 20px; }
+        .m3-switch[aria-checked="true"] { background: var(--md-primary); border-color: var(--md-primary); }
+        .m3-switch[aria-checked="true"] .m3-switch-knob { left: 25px; width: 20px; height: 20px; background: var(--md-on-primary); }
+        .m3-switch[aria-checked="true"]:active .m3-switch-knob { left: 22px; width: 24px; height: 24px; }
+        .m3-switch:active { transform: none; }
+        button:focus-visible, [role="button"]:focus-visible, input:focus-visible { outline: 3px solid var(--md-primary); outline-offset: 2px; }
+
+        .w-9 { width: 2.75rem !important; }
+        .h-9 { height: 2.75rem !important; }
+        .text-\[10px\] { font-size: 11px !important; }
+        .text-\[11px\] { font-size: 12px !important; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+            ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16 selection:bg-emerald-200 selection:text-emerald-950">
+
+    <!-- STICKY TOP APP BAR + SEGMENTED VIEW SWITCHER (Mobile-First Material 3) -->
+    <header class="sticky top-0 z-30 backdrop-blur-xl bg-md-bg/90 border-b border-black/5 dark:border-white/5 transition-colors" style="view-transition-name: site-header">
+        <div class="max-w-3xl mx-auto px-3.5 sm:px-6 pt-2.5 pb-2.5 space-y-2.5">
+            
+            <!-- Row 1: Brand + Active Profile Chip (Opens Bottom Sheet) + Theme Toggle -->
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <img id="brandLogo" src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%3E%3Cdefs%3E%3ClinearGradient%20id%3D'g'%20x1%3D'0'%20y1%3D'0'%20x2%3D'1'%20y2%3D'1'%3E%3Cstop%20offset%3D'0'%20stop-color%3D'%23FFD54A'%2F%3E%3Cstop%20offset%3D'1'%20stop-color%3D'%23FF8F1F'%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D'512'%20height%3D'512'%20fill%3D'url(%23g)'%2F%3E%3Cg%20transform%3D'translate(256%20256)%20scale(.9)%20translate(-256%20-256)'%3E%3Ccircle%20cx%3D'104'%20cy%3D'118'%20r%3D'13'%20fill%3D'%23fff'%20opacity%3D'.75'%2F%3E%3Ccircle%20cx%3D'412'%20cy%3D'96'%20r%3D'9'%20fill%3D'%23fff'%20opacity%3D'.75'%2F%3E%3Cpath%20d%3D'M420%20410l8%2020%2020%208-20%208-8%2020-8-20-20-8%2020-8z'%20fill%3D'%23fff'%20opacity%3D'.85'%2F%3E%3Cpath%20d%3D'M96%2070l6%2015%2015%206-15%206-6%2015-6-15-15-6%2015-6z'%20fill%3D'%23fff'%20opacity%3D'.85'%2F%3E%3Cg%20fill%3D'%23fff'%3E%3Crect%20x%3D'64'%20y%3D'185'%20width%3D'11'%20height%3D'80'%20rx%3D'5.5'%2F%3E%3Crect%20x%3D'84'%20y%3D'185'%20width%3D'11'%20height%3D'80'%20rx%3D'5.5'%2F%3E%3Crect%20x%3D'104'%20y%3D'185'%20width%3D'11'%20height%3D'80'%20rx%3D'5.5'%2F%3E%3Crect%20x%3D'64'%20y%3D'245'%20width%3D'51'%20height%3D'55'%20rx%3D'24'%2F%3E%3Crect%20x%3D'80'%20y%3D'290'%20width%3D'19'%20height%3D'125'%20rx%3D'9.5'%2F%3E%3Cellipse%20cx%3D'424'%20cy%3D'225'%20rx%3D'32'%20ry%3D'46'%2F%3E%3Crect%20x%3D'414'%20y%3D'265'%20width%3D'20'%20height%3D'150'%20rx%3D'10'%2F%3E%3C%2Fg%3E%3Cellipse%20cx%3D'256'%20cy%3D'292'%20rx%3D'158'%20ry%3D'148'%20fill%3D'%23E07B10'%20opacity%3D'.25'%2F%3E%3Ccircle%20cx%3D'256'%20cy%3D'272'%20r%3D'148'%20fill%3D'%23fff'%2F%3E%3Ccircle%20cx%3D'256'%20cy%3D'272'%20r%3D'118'%20fill%3D'%23FFF3D6'%20stroke%3D'%23FFC978'%20stroke-width%3D'6'%2F%3E%3Cellipse%20cx%3D'214'%20cy%3D'248'%20rx%3D'15'%20ry%3D'19'%20fill%3D'%233B2A1A'%2F%3E%3Cellipse%20cx%3D'298'%20cy%3D'248'%20rx%3D'15'%20ry%3D'19'%20fill%3D'%233B2A1A'%2F%3E%3Ccircle%20cx%3D'219'%20cy%3D'241'%20r%3D'5.5'%20fill%3D'%23fff'%2F%3E%3Ccircle%20cx%3D'303'%20cy%3D'241'%20r%3D'5.5'%20fill%3D'%23fff'%2F%3E%3Cellipse%20cx%3D'176'%20cy%3D'292'%20rx%3D'21'%20ry%3D'13'%20fill%3D'%23FF8FA3'%20opacity%3D'.85'%2F%3E%3Cellipse%20cx%3D'336'%20cy%3D'292'%20rx%3D'21'%20ry%3D'13'%20fill%3D'%23FF8FA3'%20opacity%3D'.85'%2F%3E%3Cpath%20d%3D'M208%20290%20Q256%20360%20304%20290%20Q256%20304%20208%20290z'%20fill%3D'%235A2A27'%2F%3E%3Cpath%20d%3D'M232%20322%20Q256%20302%20280%20322%20Q256%20342%20232%20322z'%20fill%3D'%23FF7B8A'%2F%3E%3Cpath%20d%3D'M256%20124%20q-8%20-40%2036%20-52%20q6%2036%20-36%2052z'%20fill%3D'%232FA84F'%2F%3E%3Cpath%20d%3D'M256%20124%20q10%20-34%20-26%20-46%20q-14%2030%2026%2046z'%20fill%3D'%2352C96D'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E" alt="" width="44" height="44" class="w-11 h-11 rounded-[14px] shrink-0 shadow-md wiggle" style="box-shadow:0 4px 10px -3px rgba(255,143,31,.55)">
+                    
+                    <div class="truncate">
+                        <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-md-textMain leading-tight truncate">Mensa Sorrento</h1>
+                        <p id="headerSubtitle" class="text-[11px] text-md-textSub font-semibold truncate">A.S. 2026/2027 • ASL NA 3 Sud</p>
+                    </div>
+                </div>
+
+                <!-- Right Actions: Settings Pill + Info + Dark Mode -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="openSearch()" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer text-md-textMain flex items-center justify-center" title="Cerca un piatto" aria-label="Cerca un piatto">
+                        <span class="material-symbols-rounded text-[22px]">search</span>
+                    </button>
+                    <!-- Profilo attivo (apre le opzioni) -->
+                    <button onclick="toggleSettingsSheet(true)" id="headerProfileBtn" class="m3-btn relative w-9 h-9 rounded-full bg-md-surfaceContainer text-md-primary flex items-center justify-center" title="Impostazioni" aria-label="Impostazioni: scuola, periodo e dieta">
+                        <span class="material-symbols-rounded text-[22px]">settings</span>
+                        <span id="optDot" class="hidden absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+                        <span class="hidden" aria-hidden="true"><span id="headerSchoolIcon">child_care</span><span id="headerSchoolLabel">Infanzia</span><span id="headerGlutenIcon"></span><span id="headerSeasonIcon">ac_unit</span></span>
+                    </button>
+
+                    <!-- ======== RIATTIVA-ICONA-INFO: per riattivare, cancella questa riga e la riga "FINE-RIATTIVA-ICONA-INFO" ========
+                    <button onclick="toggleInfoModal(true)" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer text-md-textMain flex items-center justify-center hover:bg-md-surfaceHigh" title="Linee Guida ASL" aria-label="Linee guida ASL">
+                        <span class="material-symbols-rounded text-[19px]">info</span>
+                    </button>
+                    ======== FINE-RIATTIVA-ICONA-INFO ======== -->
+                </div>
+            </div>
+
+            <div class="hidden" aria-hidden="true"><button onclick="setViewMode('day')" id="viewTab-day" class="m3-btn py-2 px-3 rounded-pill text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 bg-md-surface text-md-textMain shadow-sm">
+                    <span class="material-symbols-rounded text-[18px] text-md-primary">today</span>
+                    <span>Oggi / Giorno</span>
+                </button><button onclick="setViewMode('week')" id="viewTab-week" class="m3-btn py-2 px-3 rounded-pill text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-md-textSub hover:text-md-textMain">
+                    <span class="material-symbols-rounded text-[18px]">calendar_view_week</span>
+                    <span>Tutta la Settimana</span>
+                </button></div>
+
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER (Centered Mobile-First Column) -->
+    <main class="max-w-3xl mx-auto px-3.5 sm:px-6 pt-3.5 space-y-4">
+
+        <!-- ===================================================================
+             VISTA 1: OGGI / GIORNO SINGOLO (Default al caricamento)
+             =================================================================== -->
+        <div id="homeSection" class="hidden space-y-4"><div id="homeContent" class="space-y-5"></div></div>
+
+        <div id="dayViewSection" class="space-y-4 animate-m3">
+
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 w-full">
+                    <button onclick="setViewMode('week')" class="m3-btn inline-flex items-center justify-center gap-1 pl-3 pr-4 min-h-[48px] rounded-pill bg-md-surfaceContainer text-md-textMain text-sm font-extrabold" aria-label="Torna al menu">
+                        <span class="material-symbols-rounded text-[22px]">arrow_back</span><span>Indietro</span>
+                    </button>
+                    <button onclick="openCalendar()" class="m3-btn ml-auto inline-flex items-center justify-center w-12 h-12 rounded-full bg-md-surfaceContainer text-md-textMain" aria-label="Apri il calendario">
+                        <span class="material-symbols-rounded text-[22px]">calendar_month</span>
+                        
+                    </button>
+                    <button onclick="shareDay()" class="m3-btn inline-flex items-center justify-center w-12 h-12 rounded-full bg-md-surfaceContainer text-md-textMain" aria-label="Condividi il menu di questo giorno">
+                        <span class="material-symbols-rounded text-[18px]">share</span>
+                        
+                    </button>
+                </div>
+            </div>
+
+            <div id="closedBanner" class="hidden items-center gap-3 p-3.5 rounded-3xl bg-amber-100 text-amber-950 text-sm font-bold" role="status">
+                <span class="material-symbols-rounded text-[24px] shrink-0">event_busy</span>
+                <span id="closedBannerText"></span>
+            </div>
+
+
+            <!-- Compact Calendar Strip (Lun - Ven) + Week Navigation -->
+            <section class="m3-card p-3.5 sm:p-4 border border-black/5 dark:border-white/5 space-y-3">
+                <div class="flex items-stretch gap-2 p-1.5 rounded-[26px] bg-md-surfaceContainer/60">
+                    <button onclick="changeCalendarWeek(-1)" class="m3-btn flex flex-col items-center justify-center w-16 min-h-[56px] rounded-[20px] bg-md-surfaceHigh text-md-textMain" aria-label="Settimana precedente">
+                        <span class="material-symbols-rounded text-[24px]">chevron_left</span><span class="text-[11px] font-extrabold leading-none">Prima</span>
+                    </button>
+                    <div class="flex-1 flex flex-col items-center justify-center text-center min-w-0">
+                        <span id="currentWeekBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-pill text-[11px] font-extrabold bg-md-secondaryContainer text-md-onSecondaryContainer"><span id="currentWeekBadgeText">Questa settimana</span></span>
+                        <b id="weekRangeLabel" class="font-display text-[19px] font-semibold leading-tight whitespace-nowrap mt-0.5"></b>
+                    </div>
+                    <button onclick="changeCalendarWeek(1)" class="m3-btn flex flex-col items-center justify-center w-16 min-h-[56px] rounded-[20px] bg-md-primaryContainer text-md-onPrimaryContainer" aria-label="Settimana successiva">
+                        <span class="material-symbols-rounded text-[24px]">chevron_right</span><span class="text-[11px] font-extrabold leading-none">Dopo</span>
+                    </button>
+                </div>
+                <button onclick="resetToToday()" id="btnQuickToday" class="hidden m3-btn w-full min-h-[48px] items-center justify-center gap-2 rounded-pill bg-md-primary text-md-onPrimary text-sm font-extrabold">
+                    <span class="material-symbols-rounded text-[20px]">undo</span><span>Torna a oggi</span>
+                </button>
+                <!-- 5-Day Horizontal Selector (Mon-Fri) -->
+                <div class="grid grid-cols-5 gap-1.5 sm:gap-2.5" id="dayStripContainer">
+                    <!-- Popolato da JS -->
+                </div>
+            </section>
+
+            <!-- HERO CARD: COSA SI MANGIA OGGI (Supporta Swipe Left/Right su Mobile) -->
+            <section id="heroDayCard" class="m3-card p-4 sm:p-6 border border-black/5 dark:border-white/5 relative overflow-hidden space-y-4">
+                
+                <!-- Header Data Selezionata + Pulsanti Giorno Precedente/Successivo -->
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                            <span id="heroTodayBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-pill text-[11px] font-extrabold bg-md-primary text-md-onPrimary shadow-sm">
+                                <span class="material-symbols-rounded text-[14px]">stars</span>
+                                <span>OGGI IN MENSA</span>
+                            </span>
+                            <span id="heroSchoolBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-pill text-[11px] font-bold bg-md-tertiaryContainer text-md-onTertiaryContainer">
+                                <span id="heroSchoolBadgeIcon" class="material-symbols-rounded text-[14px]">child_care</span>
+                                <span id="heroSchoolBadgeText">Porzioni Infanzia</span>
+                            </span>
+                            <span id="heroCeliachiaBadge" class="hidden items-center gap-1 px-2.5 py-0.5 rounded-pill text-[11px] font-extrabold bg-amber-200/80 text-amber-950 dark:bg-amber-500/30 dark:text-amber-100">
+                                <span class="material-symbols-rounded text-[14px]">grain</span>
+                                <span>Senza Glutine</span>
+                            </span>
+                        </div>
+                        <h2 id="heroDateTitle" class="text-2xl sm:text-3xl font-bold text-md-textMain capitalize leading-tight">
+                            Lunedì 9 Novembre
+                        </h2>
+                    </div>
+
+                    <!-- Frecce Giorno -1 / +1 -->
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="stepDay(-1)" class="m3-btn w-9 h-9 rounded-2xl bg-md-surfaceContainer hover:bg-md-surfaceHigh flex items-center justify-center text-md-textMain" title="Giorno precedente">
+                            <span class="material-symbols-rounded text-[19px]">arrow_back</span>
+                        </button>
+                        <button onclick="stepDay(1)" class="m3-btn w-9 h-9 rounded-2xl bg-md-surfaceContainer hover:bg-md-surfaceHigh flex items-center justify-center text-md-textMain" title="Giorno successivo">
+                            <span class="material-symbols-rounded text-[19px]">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista Portate del Giorno (Primo, Secondo, Contorno) -->
+                <div id="dishesListContainer" class="space-y-3">
+                    <!-- Popolato da JS -->
+                </div>
+
+                <!-- Dotazione Fissa Giornaliera: Panino, Frutta, Acqua -->
+                <div class="pt-1">
+                    <div class="flex items-center gap-1.5 mb-2 px-1">
+                        <span class="material-symbols-rounded text-md-primary text-[17px]">verified</span>
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-md-textSub">Inclusi sempre nel vassoio</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2" id="dailyFixedExtras">
+                        <!-- Popolato da JS -->
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Giorno precedente / successivo -->
+            <section id="dayPager" class="grid grid-cols-2 gap-2.5"></section>
+
+            <!-- CARD NUTRIZIONE, QUANTITÀ & MACRONUTRIENTI DEL GIORNO -->
+            <section class="m3-card p-4 sm:p-6 border border-black/5 dark:border-white/5 space-y-4">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="w-11 h-11 rounded-2xl bg-md-tertiaryContainer text-md-onTertiaryContainer flex items-center justify-center shrink-0"><span class="material-symbols-rounded text-[24px]">monitoring</span></span>
+                    <span class="min-w-0">
+                        <span class="block font-display text-lg font-semibold text-md-textMain leading-tight">Valori nutrizionali</span>
+                        <span id="macroSubtitle" class="block text-xs text-md-textSub font-medium">Calcolo sulle grammature a crudo del giorno</span>
+                    </span>
+                </div>
+
+                <div id="nutriBody" class="space-y-4">
+                <!-- Switch Del Giorno vs Media ASL -->
+                <div class="bg-md-surfaceContainer p-1 rounded-pill grid grid-cols-2 text-xs font-bold">
+                    <button onclick="setMacroMode('daily')" id="macroBtn-daily" class="px-2.5 py-2 min-h-[40px] rounded-pill transition-all bg-md-primary text-md-onPrimary shadow-sm">Oggi</button>
+                    <button onclick="setMacroMode('asl')" id="macroBtn-asl" class="px-2.5 py-2 min-h-[40px] rounded-pill transition-all text-md-textSub">Media ASL</button>
+                </div>
+
+                <!-- 2 Box Principali: Kcal & Grammi Totali -->
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div class="p-3.5 rounded-3xl bg-md-primaryContainer/50 text-md-onPrimaryContainer flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">Energia Pasto</span>
+                            <span class="material-symbols-rounded text-[19px]">local_fire_department</span>
+                        </div>
+                        <div class="mt-1.5 flex items-baseline gap-1">
+                            <span id="statKcal" class="text-2xl sm:text-3xl font-extrabold tracking-tight">563</span>
+                            <span class="text-xs font-bold opacity-80">kcal</span>
+                        </div>
+                        <span id="statKcalNote" class="text-[11px] font-medium opacity-75 mt-0.5">Target ASL: 563 kcal</span>
+                    </div>
+
+                    <div class="p-3.5 rounded-3xl bg-md-secondaryContainer/60 text-md-onSecondaryContainer flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">Peso Alimenti</span>
+                            <span class="material-symbols-rounded text-[19px]">scale</span>
+                        </div>
+                        <div class="mt-1.5 flex items-baseline gap-1">
+                            <span id="statTotalGrams" class="text-2xl sm:text-3xl font-extrabold tracking-tight">385</span>
+                            <span class="text-xs font-bold opacity-80">g</span>
+                        </div>
+                        <span class="text-[11px] font-medium opacity-75 mt-0.5">+ 500 ml Acqua</span>
+                    </div>
+                </div>
+
+                <!-- Barre Macronutrienti con Icone Material -->
+                <div class="space-y-3 pt-1">
+                    <!-- Carboidrati -->
+                    <div>
+                        <div class="flex justify-between items-center text-xs font-bold mb-1">
+                            <span class="flex items-center gap-1.5 text-md-textMain">
+                                <span class="material-symbols-rounded text-[16px] text-amber-500">grain</span>
+                                <span>Carboidrati (Glucidi)</span>
+                            </span>
+                            <span id="macroCarbText" class="text-md-textMain">80g • 56%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-md-surfaceContainer rounded-pill overflow-hidden">
+                            <div id="macroCarbBar" class="h-full bg-amber-500 rounded-pill transition-all duration-500" style="width: 56%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Proteine -->
+                    <div>
+                        <div class="flex justify-between items-center text-xs font-bold mb-1">
+                            <span class="flex items-center gap-1.5 text-md-textMain">
+                                <span class="material-symbols-rounded text-[16px] text-emerald-600 dark:text-emerald-400">fitness_center</span>
+                                <span>Proteine</span>
+                            </span>
+                            <span id="macroProtText" class="text-md-textMain">22g • 15%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-md-surfaceContainer rounded-pill overflow-hidden">
+                            <div id="macroProtBar" class="h-full bg-emerald-600 dark:bg-emerald-400 rounded-pill transition-all duration-500" style="width: 15%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Lipidi / Grassi -->
+                    <div>
+                        <div class="flex justify-between items-center text-xs font-bold mb-1">
+                            <span class="flex items-center gap-1.5 text-md-textMain">
+                                <span class="material-symbols-rounded text-[16px] text-sky-500">water_drop</span>
+                                <span>Grassi (Lipidi)</span>
+                            </span>
+                            <span id="macroFatText" class="text-md-textMain">18g • 29%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-md-surfaceContainer rounded-pill overflow-hidden">
+                            <div id="macroFatBar" class="h-full bg-sky-500 rounded-pill transition-all duration-500" style="width: 29%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Micronutrienti Medi ASL -->
+                <div class="pt-3 border-t border-black/5 dark:border-white/5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-md-textSub block mb-2">
+                        Valori Medi Micronutrienti ASL (<span id="microSchoolName">Infanzia</span>)
+                    </span>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="p-2.5 rounded-2xl bg-md-surfaceContainer">
+                            <span class="text-[11px] text-md-textSub font-semibold block">Fibra</span>
+                            <span id="microFiber" class="text-sm font-extrabold text-md-textMain">9 g</span>
+                        </div>
+                        <div class="p-2.5 rounded-2xl bg-md-surfaceContainer">
+                            <span class="text-[11px] text-md-textSub font-semibold block">Ferro</span>
+                            <span id="microIron" class="text-sm font-extrabold text-md-textMain">4 mg</span>
+                        </div>
+                        <div class="p-2.5 rounded-2xl bg-md-surfaceContainer">
+                            <span class="text-[11px] text-md-textSub font-semibold block">Calcio</span>
+                            <span id="microCalcium" class="text-sm font-extrabold text-md-textMain">296 mg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer macronutrienti -->
+                <p class="px-1 text-[11px] leading-snug text-md-textSub" role="note">Valori indicativi, calcolati sulle tabelle ASL: possono variare con marca, cottura e porzione. Per allergie, intolleranze o diete particolari rivolgersi al pediatra o al nutrizionista.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ===================================================================
+             VISTA 2: RIEPILOGO DI TUTTA LA SETTIMANA (Con selettore 1ª-4ª sett.)
+             =================================================================== -->
+        <div id="weekViewSection" class="hidden space-y-4 animate-m3">
+            
+            <!-- Banner: aggiungi alla schermata Home -->
+            <section id="installBanner" class="hidden items-center gap-3 p-3.5 rounded-3xl bg-md-primaryContainer text-md-onPrimaryContainer" aria-label="Aggiungi l'app alla schermata Home">
+                <span class="material-symbols-rounded text-[28px] shrink-0">install_mobile</span>
+                <div class="flex-1 min-w-0">
+                    <b class="block text-sm font-extrabold leading-tight">Aggiungi l'app alla Home</b>
+                    <span class="text-xs font-semibold opacity-80">Apri il menù con un tocco, come un'app.</span>
+                </div>
+                <button id="installBannerBtn" onclick="installApp()" class="m3-btn px-4 py-2 min-h-[44px] rounded-pill bg-md-primary text-md-onPrimary text-xs font-extrabold shrink-0">Aggiungi</button>
+                <button onclick="dismissInstallBanner()" class="m3-btn w-9 h-9 rounded-full bg-md-surface/60 flex items-center justify-center shrink-0" aria-label="Nascondi il suggerimento"><span class="material-symbols-rounded text-[20px]">close</span></button>
+            </section>
+
+            <!-- Selettore Rapido delle 4 Settimane di Rotazione ASL -->
+            <section class="m3-card p-4 border border-black/5 dark:border-white/5 space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-extrabold text-md-textMain flex items-center gap-1.5">
+                            <span class="material-symbols-rounded text-md-primary text-[22px]">calendar_view_week</span>
+                            <span>Resoconto della settimana</span>
+                        </h2>
+                        <p id="weekViewSubLabel" class="text-xs text-md-textSub font-medium">Tocca un giorno per vedere il dettaglio</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="openCalendar()" class="m3-btn w-9 h-9 rounded-full bg-md-secondaryContainer text-md-onSecondaryContainer flex items-center justify-center" title="Apri il calendario" aria-label="Apri il calendario"><span class="material-symbols-rounded text-[20px]">calendar_month</span></button>
+                        <button onclick="changeCalendarWeek(-1)" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer flex items-center justify-center text-md-textMain" title="Settimana precedente" aria-label="Settimana precedente"><span class="material-symbols-rounded text-[20px]">chevron_left</span></button>
+                        <button onclick="goToCurrentWeek()" class="m3-btn px-3 py-1.5 min-h-[44px] rounded-pill bg-md-primaryContainer text-md-onPrimaryContainer text-xs font-extrabold flex items-center gap-1"><span class="material-symbols-rounded text-[15px]">today</span><span>Oggi</span></button>
+                        <button onclick="changeCalendarWeek(1)" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer flex items-center justify-center text-md-textMain" title="Settimana successiva" aria-label="Settimana successiva"><span class="material-symbols-rounded text-[20px]">chevron_right</span></button>
+                    </div>
+                </div>
+
+                <!-- 4 Tabs Settimane ASL -->
+                <div class="grid grid-cols-4 bg-md-surfaceContainer p-1 rounded-pill gap-1">
+                    <button onclick="jumpToMenuWeek(1)" id="wkBtn-1" class="m3-btn py-2 rounded-pill text-xs font-bold transition-all">1ª Sett</button>
+                    <button onclick="jumpToMenuWeek(2)" id="wkBtn-2" class="m3-btn py-2 rounded-pill text-xs font-bold transition-all">2ª Sett</button>
+                    <button onclick="jumpToMenuWeek(3)" id="wkBtn-3" class="m3-btn py-2 rounded-pill text-xs font-bold transition-all">3ª Sett</button>
+                    <button onclick="jumpToMenuWeek(4)" id="wkBtn-4" class="m3-btn py-2 rounded-pill text-xs font-bold transition-all">4ª Sett</button>
+                </div>
+            </section>
+
+            <!-- Lista verticale/griglia dei 5 Giorni (Lunedì - Venerdì) -->
+            <div id="weekOverviewGrid" class="space-y-3">
+                <!-- Popolato da JS -->
+            </div>
+        </div>
+
+        <!-- ======== RIATTIVA-FONTE-E-DISCLAIMER: per riattivare, cancella questa riga e la riga "FINE-RIATTIVA-FONTE-E-DISCLAIMER" ========
+        <footer class="mt-6 mb-4 p-4 rounded-3xl bg-md-surfaceContainer text-md-textSub text-[11px] leading-relaxed space-y-3" role="contentinfo">
+            <div>
+                <span class="font-extrabold uppercase tracking-wider text-[10px] block mb-1 text-md-textMain">Fonte dei dati</span>
+                Tabelle dietetiche ASL Napoli 3 Sud (UOC SIAN, Torre del Greco), prot. 178986 del 21/09/2023, con il menù del Comune di Sorrento in vigore dal 22 ottobre. Per l'A.S. 2026/2027 l'app usa la stessa rotazione su 4 settimane finché non viene pubblicato un documento aggiornato: verifica sempre il menù ufficiale del Comune. Giorni di chiusura: calendario scolastico della Regione Campania 2026/2027 (DGR n. 199 del 20/05/2026); i singoli istituti possono adattarlo.
+            </div>
+            <div>
+                <span class="font-extrabold uppercase tracking-wider text-[10px] block mb-1 text-md-textMain">Disclaimer</span>
+                Questa applicazione è un semplice strumento di consultazione creato per facilitare la lettura del calendario e dei menu della mensa scolastica. Non è un servizio ufficiale e non è affiliata al Comune di Sorrento, all'ASL Napoli 3 Sud o ad altri enti. I dati mostrati potrebbero contenere errori, omissioni o non essere aggiornati: l'autore non si assume alcuna responsabilità per l'uso che ne viene fatto né per eventuali danni o disagi derivanti. Per informazioni ufficiali, allergie, intolleranze e diete speciali, fare sempre riferimento ai documenti pubblicati dal Comune e dall'ASL e al personale competente.
+            </div>
+        </footer>
+        ======== FINE-RIATTIVA-FONTE-E-DISCLAIMER ======== -->
+
+        <!-- Torna in cima -->
+        <button id="btnTop" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="m3-btn fixed bottom-5 right-4 sm:right-8 z-40 w-12 h-12 rounded-full bg-md-primary text-md-onPrimary shadow-lg flex items-center justify-center opacity-0 pointer-events-none translate-y-4" title="Torna in cima" aria-label="Torna in cima">
+            <span class="material-symbols-rounded text-[24px]">keyboard_arrow_up</span>
+        </button>
+
+        <!-- Toast -->
+        <div id="toast" role="status" aria-live="polite" class="fixed left-1/2 bottom-20 z-50 -translate-x-1/2 px-4 py-2.5 rounded-pill bg-md-textMain text-md-bg text-xs font-bold shadow-lg opacity-0 pointer-events-none"></div>
+
+    </main>
+
+
+    <!-- =======================================================================
+         BOTTOM SHEET IMPOSTAZIONI: SCUOLA (Default Infanzia), STAGIONE, CELIACHIA
+         ======================================================================= -->
+    <div id="settingsSheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4 transition-opacity" onclick="if(event.target === this) toggleSettingsSheet(false)">
+        <div class="bg-md-surface text-md-textMain w-full max-w-lg rounded-t-4xl sm:rounded-4xl p-5 sm:p-6 shadow-2xl border border-black/10 dark:border-white/10 space-y-5 animate-m3">
+            
+            <!-- Handle bar mobile + Header -->
+            <div>
+                <div class="w-10 h-1.5 bg-md-outline/30 rounded-full mx-auto mb-4 sm:hidden"></div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-10 h-10 rounded-2xl bg-md-primaryContainer text-md-onPrimaryContainer flex items-center justify-center">
+                            <span class="material-symbols-rounded text-[22px]">settings</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-extrabold leading-tight">Personalizza Menù & Porzioni</h3>
+                            <p class="text-xs text-md-textSub font-medium">Scegli scuola, periodo e preferenze</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleSettingsSheet(false)" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer flex items-center justify-center">
+                        <span class="material-symbols-rounded text-[20px]">close</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 1. Scelta Scuola (Porzioni e Grammature) -->
+            <div class="space-y-2">
+                <label class="text-xs font-extrabold uppercase tracking-wider text-md-textSub flex items-center gap-1.5">
+                    <span class="material-symbols-rounded text-[16px] text-md-primary">school</span>
+                    <span>Scuola (modifica grammature e calorie)</span>
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setSchool('infanzia')" id="school-infanzia" class="m3-btn p-3 rounded-3xl flex flex-col items-center gap-1 border text-center transition-all">
+                        <span class="material-symbols-rounded text-[24px]">child_care</span>
+                        <span class="text-xs font-extrabold">Infanzia</span>
+                        <span class="text-[10px] opacity-75 font-semibold">563 kcal</span>
+                    </button>
+                    <button onclick="setSchool('primaria')" id="school-primaria" class="m3-btn p-3 rounded-3xl flex flex-col items-center gap-1 border text-center transition-all">
+                        <span class="material-symbols-rounded text-[24px]">backpack</span>
+                        <span class="text-xs font-extrabold">Primaria</span>
+                        <span class="text-[10px] opacity-75 font-semibold">718 kcal</span>
+                    </button>
+                    <button onclick="setSchool('secondaria')" id="school-secondaria" class="m3-btn p-3 rounded-3xl flex flex-col items-center gap-1 border text-center transition-all">
+                        <span class="material-symbols-rounded text-[24px]">menu_book</span>
+                        <span class="text-xs font-extrabold">Secondaria</span>
+                        <span class="text-[10px] opacity-75 font-semibold">822 kcal</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Scelta Stagionalità Menù -->
+            <div class="space-y-2">
+                <label class="text-xs font-extrabold uppercase tracking-wider text-md-textSub flex items-center gap-1.5">
+                    <span class="material-symbols-rounded text-[16px] text-md-primary">calendar_month</span>
+                    <span>Periodo Stagionale ASL</span>
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="setSeason('winter')" id="season-winter" class="m3-btn p-3 rounded-3xl flex items-center gap-2.5 border text-left transition-all">
+                        <span class="material-symbols-rounded text-[22px] shrink-0">ac_unit</span>
+                        <div>
+                            <span class="text-xs font-extrabold block">Autunno / Inverno</span>
+                            <span class="text-[10px] opacity-75 font-semibold block">Dal 22 Ottobre</span>
+                        </div>
+                    </button>
+                    <button onclick="setSeason('spring')" id="season-spring" class="m3-btn p-3 rounded-3xl flex items-center gap-2.5 border text-left transition-all">
+                        <span class="material-symbols-rounded text-[22px] shrink-0">wb_sunny</span>
+                        <div>
+                            <span class="text-xs font-extrabold block">Primavera / Estate</span>
+                            <span class="text-[10px] opacity-75 font-semibold block">Dal 21 Marzo</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. Opzione Celiachia (Senza Glutine) -->
+            <div class="p-3.5 rounded-3xl bg-md-surfaceContainer flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-md-surface text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-rounded text-[22px]">grain</span>
+                    </div>
+                    <div>
+                        <span class="text-xs sm:text-sm font-extrabold text-md-textMain block">Dieta Celiachia (Senza Glutine)</span>
+                        <span class="text-[11px] text-md-textSub font-medium block">Mostra i prodotti specifici senza glutine in ogni piatto</span>
+                    </div>
+                </div>
+                <button onclick="toggleCeliachia()" id="celSwitch" role="switch" aria-checked="false" aria-label="Dieta celiachia senza glutine" class="m3-switch shrink-0">
+                    <span class="m3-switch-knob"></span>
+                </button>
+                <button id="btnCeliachia" class="hidden" tabindex="-1" aria-hidden="true"></button>
+            </div>
+
+            <button id="btnInstall" onclick="installApp()" class="m3-btn w-full py-3 min-h-[48px] rounded-pill bg-md-secondaryContainer text-md-onSecondaryContainer font-extrabold text-sm flex items-center justify-center gap-2">
+                <span class="material-symbols-rounded text-[20px]">install_mobile</span>
+                <span>Aggiungi alla schermata Home</span>
+            </button>
+
+            <button onclick="toggleSettingsSheet(false)" class="m3-btn w-full py-3.5 rounded-pill bg-md-primary text-md-onPrimary font-extrabold text-sm shadow-sm">
+                Applica e torna al menù
+            </button>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         MODAL: LINEE GUIDA UFFICIALI ASL NAPOLI 3 SUD
+         ======================================================================= -->
+    <div id="infoModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4 transition-opacity" onclick="if(event.target === this) toggleInfoModal(false)">
+        <div class="bg-md-surface text-md-textMain w-full max-w-2xl rounded-t-4xl sm:rounded-4xl max-h-[88vh] overflow-y-auto p-6 shadow-2xl border border-black/10 dark:border-white/10 animate-m3">
+            <div class="flex items-center justify-between pb-4 border-b border-black/10 dark:border-white/10 sticky top-0 bg-md-surface z-10">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-md-primaryContainer text-md-onPrimaryContainer flex items-center justify-center">
+                        <span class="material-symbols-rounded text-[22px]">health_and_safety</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-extrabold">Linee Guida Ufficiali ASL</h3>
+                        <p class="text-xs text-md-textSub">Comune di Sorrento • ASL Napoli 3 Sud (SIAN)</p>
+                    </div>
+                </div>
+                <button onclick="toggleInfoModal(false)" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer flex items-center justify-center">
+                    <span class="material-symbols-rounded text-[20px]">close</span>
+                </button>
+            </div>
+
+            <div class="space-y-4 py-4 text-xs sm:text-sm leading-relaxed text-md-textSub">
+                <div class="p-4 rounded-3xl bg-md-surfaceContainer space-y-1.5">
+                    <h4 class="font-extrabold text-md-textMain flex items-center gap-1.5">
+                        <span class="material-symbols-rounded text-[18px] text-md-primary">scale</span>
+                        <span>Grammature a Crudo</span>
+                    </h4>
+                    <p>Le grammature indicate nelle tabelle dietetiche si intendono sempre relative al <strong>prodotto crudo al netto degli scarti</strong> (parti non edibili). Tutte le pietanze sono condite con olio extravergine d'oliva e sale iodato usato moderatamente.</p>
+                </div>
+
+                <div class="p-4 rounded-3xl bg-md-surfaceContainer space-y-1.5">
+                    <h4 class="font-extrabold text-md-textMain flex items-center gap-1.5">
+                        <span class="material-symbols-rounded text-[18px] text-md-primary">grain</span>
+                        <span>Raccomandazioni Celiachia (Senza Glutine)</span>
+                    </h4>
+                    <p>Per gli alunni celiaci è previsto l'utilizzo esclusivo di prodotti dietetici specifici privi di glutine (Reg. UE 1169/2011 e Legge Reg. Campania n. 2/2003): pasta, pastina, pane, farina, bastoncini di pesce e pan grattato rigorosamente senza glutine.</p>
+                </div>
+
+                <div class="p-4 rounded-3xl bg-md-surfaceContainer space-y-1.5">
+                    <h4 class="font-extrabold text-md-textMain flex items-center gap-1.5">
+                        <span class="material-symbols-rounded text-[18px] text-md-primary">nutrition</span>
+                        <span>Qualità degli Ingredienti e Sostituzioni</span>
+                    </h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><strong>Frutta di stagione:</strong> mele, pere, arance, mandarini, clementine, banane, pesche, albicocche, kiwi, ananas per assicurare variabilità.</li>
+                        <li><strong>Carni e Salumi:</strong> carni bovine e avicole fresche e refrigerate; prosciutto cotto magro <strong>privo di polifosfati</strong>.</li>
+                        <li><strong>Sostituzioni religiose (senza carne suina):</strong> sostituire il prosciutto cotto magro con <em>bresaola di bovino</em> o <em>fesa di tacchino</em>.</li>
+                        <li><strong>Uova e Latticini:</strong> uova fresche categoria Extra o A; ricotta e mozzarella esclusivamente da latte vaccino.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button onclick="toggleInfoModal(false)" class="m3-btn w-full py-3 rounded-pill bg-md-primary text-md-onPrimary font-bold text-sm">
+                    Ho capito, chiudi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALENDARIO -->
+    <div id="calSheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4" onclick="if(event.target === this) closeCalendar()">
+        <div class="bg-md-surface text-md-textMain w-full max-w-sm rounded-t-4xl sm:rounded-4xl p-5 shadow-2xl border border-black/10 space-y-3" role="dialog" aria-label="Calendario">
+            <div class="w-10 h-1.5 bg-md-outline/30 rounded-full mx-auto sm:hidden"></div>
+            <div class="flex items-center justify-between gap-2">
+                <button onclick="calShift(-1)" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer flex items-center justify-center" aria-label="Mese precedente"><span class="material-symbols-rounded text-[20px]">chevron_left</span></button>
+                <div class="text-center min-w-0">
+                    <h3 id="calTitle" class="text-base font-extrabold capitalize leading-tight"></h3>
+                    <p id="calHint" class="text-[11px] text-md-textSub font-semibold"></p>
+                </div>
+                <button onclick="calShift(1)" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer flex items-center justify-center" aria-label="Mese successivo"><span class="material-symbols-rounded text-[20px]">chevron_right</span></button>
+            </div>
+            <div class="grid grid-cols-7 text-center text-[11px] font-extrabold uppercase text-md-textSub"><span>L</span><span>M</span><span>M</span><span>G</span><span>V</span><span>S</span><span>D</span></div>
+            <div id="calGrid" class="grid grid-cols-7 gap-y-1 text-center"></div>
+            <p id="calLegend" class="flex items-center gap-1.5 text-[11px] text-md-textSub font-semibold"><span class="cal-legend-dot"></span><span>Scuole chiuse: festività e vacanze (Regione Campania)</span></p>
+            <p id="calClosedNote" class="hidden items-start gap-2 p-3 rounded-2xl bg-amber-100 text-amber-950 text-xs font-bold"><span class="material-symbols-rounded text-[18px] shrink-0">event_busy</span><span id="calClosedNoteText"></span></p>
+            <div class="flex items-center justify-between gap-2 pt-1">
+                <button onclick="calToday()" class="m3-btn px-4 py-2 min-h-[44px] rounded-pill bg-md-primaryContainer text-md-onPrimaryContainer text-xs font-extrabold flex items-center gap-1"><span class="material-symbols-rounded text-[16px]">today</span><span>Oggi</span></button>
+                <button onclick="closeCalendar()" class="m3-btn px-4 py-2 min-h-[44px] rounded-pill bg-md-surfaceContainer text-md-textMain text-xs font-extrabold">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RICERCA PIATTO -->
+    <div id="searchSheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4" onclick="if(event.target === this) closeSearch()">
+        <div class="bg-md-surface text-md-textMain w-full max-w-lg rounded-t-4xl sm:rounded-4xl p-5 shadow-2xl border border-black/10 space-y-3 max-h-[85vh] flex flex-col" role="dialog" aria-label="Cerca un piatto">
+            <div class="w-10 h-1.5 bg-md-outline/30 rounded-full mx-auto sm:hidden shrink-0"></div>
+            <div class="flex items-center gap-2 shrink-0">
+                <label class="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-pill bg-md-surfaceContainer">
+                    <span class="material-symbols-rounded text-[20px] text-md-primary">search</span>
+                    <input id="searchInput" type="search" inputmode="search" autocomplete="off" placeholder="Cerca un piatto (es. pizza, pesce)" class="w-full bg-transparent outline-none text-sm font-semibold text-md-textMain placeholder:text-md-textSub" oninput="runSearch(this.value)">
+                </label>
+                <button onclick="closeSearch()" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer flex items-center justify-center" aria-label="Chiudi la ricerca"><span class="material-symbols-rounded text-[20px]">close</span></button>
+            </div>
+            <div id="searchChips" class="flex flex-wrap gap-2 shrink-0"></div>
+            <div id="searchResults" class="space-y-2 overflow-y-auto pr-0.5"></div>
+        </div>
+    </div>
+
+    <!-- ISTRUZIONI: AGGIUNGI ALLA SCHERMATA HOME -->
+    <div id="installSheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4" onclick="if(event.target === this) closeInstallSheet()">
+        <div class="bg-md-surface text-md-textMain w-full max-w-md rounded-t-4xl sm:rounded-4xl p-5 sm:p-6 shadow-2xl border border-black/10 space-y-4" role="dialog" aria-label="Aggiungi alla schermata Home">
+            <div class="w-10 h-1.5 bg-md-outline/30 rounded-full mx-auto sm:hidden"></div>
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-11 h-11 rounded-2xl bg-md-primaryContainer text-md-onPrimaryContainer flex items-center justify-center shrink-0"><span class="material-symbols-rounded text-[24px]">install_mobile</span></div>
+                    <div class="min-w-0">
+                        <h3 id="installTitle" class="text-lg font-extrabold leading-tight">Aggiungi alla schermata Home</h3>
+                        <p id="installSub" class="text-xs text-md-textSub font-semibold"></p>
+                    </div>
+                </div>
+                <button onclick="closeInstallSheet()" class="m3-btn w-9 h-9 rounded-full bg-md-surfaceContainer flex items-center justify-center shrink-0" aria-label="Chiudi"><span class="material-symbols-rounded text-[20px]">close</span></button>
+            </div>
+            <ol id="installSteps" class="space-y-2.5"></ol>
+            <p id="installNote" class="hidden p-3 rounded-2xl bg-amber-100 text-amber-950 text-xs font-bold"></p>
+            <button onclick="closeInstallSheet()" class="m3-btn w-full py-3 min-h-[48px] rounded-pill bg-md-primary text-md-onPrimary font-extrabold text-sm">Ho capito</button>
+        </div>
+    </div>
+
+    <script>
+        /*************************************************************************
+         * 1. DATABASE NUTRIZIONALE E MENÙ UFFICIALE ASL NAPOLI 3 SUD (SORRENTO)
+         * Tutte le icone usano esclusivamente Google Material Symbols Rounded.
+         *************************************************************************/
+        
+        const ASL_OFFICIAL_TARGETS = {
+            infanzia: {
+                label: "Scuola dell'Infanzia",
+                shortLabel: "Infanzia",
+                icon: "child_care",
+                kcal: 563,
+                protGrams: 22, protPct: 15,
+                carbGrams: 80, carbPct: 56,
+                fatGrams: 18,  fatPct: 29,
+                fiber: "9 g", iron: "4 mg", calcium: "296 mg",
+                fruitGrams: 100, breadGrams: 30
+            },
+            primaria: {
+                label: "Scuola Primaria",
+                shortLabel: "Primaria",
+                icon: "backpack",
+                kcal: 718,
+                protGrams: 28, protPct: 15,
+                carbGrams: 105, carbPct: 58,
+                fatGrams: 22,  fatPct: 27,
+                fiber: "11 g", iron: "5 mg", calcium: "351 mg",
+                fruitGrams: 150, breadGrams: 50
+            },
+            secondaria: {
+                label: "Scuola Secondaria I Grado",
+                shortLabel: "Secondaria",
+                icon: "menu_book",
+                kcal: 822,
+                protGrams: 33, protPct: 15,
+                carbGrams: 116, carbPct: 57,
+                fatGrams: 26,  fatPct: 28,
+                fiber: "14 g", iron: "6,5 mg", calcium: "424 mg",
+                fruitGrams: 150, breadGrams: 50
+            }
+        };
+
+        const FOOD_MACROS_PER_100G = {
+            pasta:       { kcal: 353, carb: 72.0, prot: 12.5, fat: 1.5 },
+            riso:        { kcal: 358, carb: 78.0, prot: 7.5,  fat: 1.0 },
+            farina:      { kcal: 340, carb: 71.0, prot: 11.0, fat: 1.5 },
+            pane:        { kcal: 275, carb: 56.0, prot: 8.6,  fat: 1.5 },
+            legumi_sec:  { kcal: 315, carb: 50.0, prot: 22.0, fat: 2.0 },
+            piselli:     { kcal: 75,  carb: 12.0, prot: 5.5,  fat: 0.5 },
+            patate:      { kcal: 80,  carb: 18.0, prot: 2.0,  fat: 0.1 },
+            verdura:     { kcal: 25,  carb: 4.0,  prot: 1.5,  fat: 0.2 },
+            pomodoro:    { kcal: 20,  carb: 3.5,  prot: 1.0,  fat: 0.2 },
+            uovo:        { kcal: 128, carb: 0.7,  prot: 12.4, fat: 8.7 },
+            parmigiano:  { kcal: 402, carb: 0.0,  prot: 32.4, fat: 29.7 },
+            mozzarella:  { kcal: 253, carb: 0.7,  prot: 18.7, fat: 19.5 },
+            ricotta:     { kcal: 146, carb: 3.5,  prot: 8.8,  fat: 10.9 },
+            form_fuso:   { kcal: 270, carb: 2.5,  prot: 17.5, fat: 21.0 },
+            tacchino:    { kcal: 107, carb: 0.0,  prot: 24.0, fat: 1.2 },
+            manzo:       { kcal: 127, carb: 0.0,  prot: 20.5, fat: 5.0 },
+            prosciutto:  { kcal: 132, carb: 0.9,  prot: 20.0, fat: 5.2 },
+            merluzzo_imp:{ kcal: 198, carb: 15.0, prot: 13.5, fat: 9.2 },
+            pesce_fil:   { kcal: 82,  carb: 0.0,  prot: 17.5, fat: 1.2 },
+            olio:        { kcal: 899, carb: 0.0,  prot: 0.0,  fat: 99.9 },
+            burro:       { kcal: 758, carb: 0.6,  prot: 0.8,  fat: 83.4 },
+            latte_scr:   { kcal: 36,  carb: 5.0,  prot: 3.6,  fat: 0.2 },
+            pesto:       { kcal: 450, carb: 6.0,  prot: 5.0,  fat: 45.0 },
+            frutta:      { kcal: 52,  carb: 12.5, prot: 0.5,  fat: 0.2 }
+        };
+
+        const MENU_DATA = {
+            1: [ // SETTIMANA 1
+                {
+                    dayIndex: 0, dayName: "Lunedì",
+                    primo: {
+                        name: "Pasta e piselli", icon: "soup_kitchen",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 50, primaria: 50, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Piselli", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "piselli" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Frittata di uova", icon: "egg_alt",
+                        ingredients: [
+                            { name: "Uovo intero", g: { infanzia: 50, primaria: 50, secondaria: 50 }, type: "uovo" },
+                            { name: "Parmigiano", g: { infanzia: 2, primaria: 3, secondaria: 3 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 3, primaria: 3, secondaria: 4 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Patate lesse o al forno", icon: "psychiatry",
+                        ingredients: [
+                            { name: "Patate", g: { infanzia: 80, primaria: 80, secondaria: 120 }, type: "patate" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 1, dayName: "Martedì",
+                    primo: {
+                        name: "Riso con cavolo verza", icon: "rice_bowl",
+                        ingredients: [
+                            { name: "Riso parboiled", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "riso" },
+                            { name: "Cavolo verza", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Pasta con zucchine", icon: "ramen_dining",
+                            ingredients: [
+                                { name: "Pasta di semola", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                                { name: "Zucchine", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                                { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    },
+                    secondo: {
+                        name: "Petto di tacchino", icon: "dinner_dining",
+                        ingredients: [
+                            { name: "Petto di tacchino", g: { infanzia: 50, primaria: 60, secondaria: 70 }, type: "tacchino" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 6 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Carote in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Carote cotte o crude", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 2, dayName: "Mercoledì",
+                    primo: {
+                        name: "Pasta e fagioli", icon: "soup_kitchen",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 40, primaria: 40, secondaria: 50 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Fagioli secchi", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "legumi_sec" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Mozzarella", icon: "tapas",
+                        ingredients: [
+                            { name: "Mozzarella vaccina", g: { infanzia: 40, primaria: 60, secondaria: 80 }, type: "mozzarella" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Vellutata di zucca", icon: "soup_kitchen",
+                        portionNote: { infanzia: "Porzione 100g", primaria: "Porzione 120g", secondaria: "Porzione 200g" },
+                        ingredients: [
+                            { name: "Zucca", g: { infanzia: 70, primaria: 80, secondaria: 150 }, type: "verdura" },
+                            { name: "Patate", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "patate" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Fagiolini all'olio", icon: "grass",
+                            ingredients: [
+                                { name: "Fagiolini", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    dayIndex: 3, dayName: "Giovedì",
+                    primo: {
+                        name: "Pasta al pomodoro", icon: "ramen_dining",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 60, primaria: 70, secondaria: 80 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Pomodoro", g: { infanzia: "q.b.", primaria: "q.b.", secondaria: "q.b." }, calcGrams: 50, type: "pomodoro" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Bastoncini di merluzzo impanato", icon: "set_meal",
+                        ingredients: [
+                            { name: "Bastoncini di merluzzo", g: { infanzia: "n. 2 (60g)", primaria: "n. 3 (90g)", secondaria: "n. 3 (90g)" }, calcGrams: { infanzia: 60, primaria: 90, secondaria: 90 }, type: "merluzzo_imp", glutenFree: "Bastoncini senza glutine" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Spinaci al burro", icon: "grass",
+                        ingredients: [
+                            { name: "Spinaci", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Burro", g: { infanzia: 5, primaria: 7, secondaria: 10 }, type: "burro" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 4, dayName: "Venerdì",
+                    primo: {
+                        name: "Pastina con minestrone", icon: "soup_kitchen",
+                        ingredients: [
+                            { name: "Pastina di semola", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "pasta", glutenFree: "Pastina senza glutine" },
+                            { name: "Minestrone surgelato", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Pasta all'ortolana", icon: "ramen_dining",
+                            ingredients: [
+                                { name: "Pasta di semola", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                                { name: "Melanzane, peperoni, zucchine e pomodori", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                                { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    },
+                    secondo: {
+                        name: "Polpette al pomodoro", icon: "dinner_dining",
+                        portionNote: { infanzia: "Porzione 60g", primaria: "Porzione 70g", secondaria: "Porzione 70g" },
+                        ingredients: [
+                            { name: "Manzo magro", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "manzo" },
+                            { name: "Pane", g: { infanzia: 10, primaria: 10, secondaria: 10 }, type: "pane", glutenFree: "Pane senza glutine" },
+                            { name: "Uova", g: { infanzia: 3, primaria: 3, secondaria: 3 }, type: "uovo" },
+                            { name: "Pomodoro", g: { infanzia: "q.b.", primaria: "q.b.", secondaria: "q.b." }, calcGrams: 30, type: "pomodoro" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 3, primaria: 3, secondaria: 4 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Lattuga o indivia in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Lattuga o indivia", g: { infanzia: 50, primaria: 70, secondaria: 150 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                }
+            ],
+
+            2: [ // SETTIMANA 2 (SETTIMANA DI PARTENZA DI OGGI)
+                {
+                    dayIndex: 0, dayName: "Lunedì",
+                    primo: {
+                        name: "Pasta e lenticchie", icon: "soup_kitchen",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 40, primaria: 40, secondaria: 50 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Lenticchie secche", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "legumi_sec" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Formaggio fuso", icon: "tapas",
+                        ingredients: [
+                            { name: "Formaggio fuso", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "form_fuso" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Carote in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Carote cotte o crude", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 1, dayName: "Martedì",
+                    primo: {
+                        name: "Pasta con patate", icon: "ramen_dining",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Patate", g: { infanzia: 50, primaria: 60, secondaria: 80 }, type: "patate" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Frittata di uova", icon: "egg_alt",
+                        ingredients: [
+                            { name: "Uovo intero", g: { infanzia: 50, primaria: 50, secondaria: 50 }, type: "uovo" },
+                            { name: "Parmigiano", g: { infanzia: 2, primaria: 3, secondaria: 3 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 3, primaria: 3, secondaria: 4 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Spinaci in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Spinaci", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 2, dayName: "Mercoledì",
+                    primo: {
+                        name: "Pasta al pomodoro", icon: "ramen_dining",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 60, primaria: 70, secondaria: 80 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Pomodoro", g: { infanzia: "q.b.", primaria: "q.b.", secondaria: "q.b." }, calcGrams: 50, type: "pomodoro" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Filetti di sogliola o platessa", icon: "set_meal",
+                        ingredients: [
+                            { name: "Filetti di sogliola o platessa", g: { infanzia: 50, primaria: 60, secondaria: 70 }, type: "pesce_fil" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 6 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Finocchi in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Finocchi cotti o crudi", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Pomodori in insalata", icon: "eco",
+                            ingredients: [
+                                { name: "Pomodori in insalata", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "pomodoro" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    dayIndex: 3, dayName: "Giovedì",
+                    primo: {
+                        name: "Pasta con zucca", icon: "ramen_dining",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Zucca", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Pasta con zucchine", icon: "ramen_dining",
+                            ingredients: [
+                                { name: "Pasta di semola", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                                { name: "Zucchine", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                                { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    },
+                    secondo: {
+                        name: "Polpette in umido", icon: "dinner_dining",
+                        portionNote: { infanzia: "Porzione 60g", primaria: "Porzione 70g", secondaria: "Porzione 70g" },
+                        ingredients: [
+                            { name: "Manzo magro", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "manzo" },
+                            { name: "Pane", g: { infanzia: 10, primaria: 10, secondaria: 10 }, type: "pane", glutenFree: "Pane senza glutine" },
+                            { name: "Uova", g: { infanzia: 3, primaria: 3, secondaria: 3 }, type: "uovo" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 3, primaria: 3, secondaria: 4 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Lattuga o indivia in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Lattuga o indivia", g: { infanzia: 50, primaria: 70, secondaria: 150 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 4, dayName: "Venerdì",
+                    primo: {
+                        name: "Riso con fagioli", icon: "rice_bowl",
+                        ingredients: [
+                            { name: "Riso parboiled", g: { infanzia: 40, primaria: 40, secondaria: 50 }, type: "riso" },
+                            { name: "Fagioli secchi", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "legumi_sec" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Prosciutto cotto magro", icon: "dinner_dining",
+                        ingredients: [
+                            { name: "Prosciutto cotto magro", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "prosciutto", glutenFree: "Prosciutto senza glutine" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Purè di patate", icon: "psychiatry",
+                        portionNote: { infanzia: "Porzione 100g", primaria: "Porzione 100g", secondaria: "Porzione 150g" },
+                        ingredients: [
+                            { name: "Patate", g: { infanzia: 80, primaria: 80, secondaria: 120 }, type: "patate" },
+                            { name: "Latte scremato", g: { infanzia: 10, primaria: 10, secondaria: 30 }, type: "latte_scr" },
+                            { name: "Parmigiano", g: { infanzia: 2, primaria: 2, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Burro", g: { infanzia: 5, primaria: 5, secondaria: 10 }, type: "burro" }
+                        ]
+                    }
+                }
+            ],
+
+            3: [ // SETTIMANA 3
+                {
+                    dayIndex: 0, dayName: "Lunedì",
+                    primo: {
+                        name: "Pasta al pomodoro", icon: "ramen_dining",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 60, primaria: 70, secondaria: 80 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Pomodoro", g: { infanzia: "q.b.", primaria: "q.b.", secondaria: "q.b." }, calcGrams: 50, type: "pomodoro" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Ricotta vaccina fresca", icon: "tapas",
+                        ingredients: [
+                            { name: "Ricotta vaccina fresca", g: { infanzia: 50, primaria: 80, secondaria: 120 }, type: "ricotta" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Carote in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Carote cotte o crude", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 1, dayName: "Martedì",
+                    primo: {
+                        name: "Pasta e ceci", icon: "soup_kitchen",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Ceci secchi", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "legumi_sec" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Bastoncini di merluzzo impanato", icon: "set_meal",
+                        ingredients: [
+                            { name: "Bastoncini di merluzzo", g: { infanzia: "n. 2 (60g)", primaria: "n. 3 (90g)", secondaria: "n. 3 (90g)" }, calcGrams: { infanzia: 60, primaria: 90, secondaria: 90 }, type: "merluzzo_imp", glutenFree: "Bastoncini senza glutine" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Bietoline in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Bietoline", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 2, dayName: "Mercoledì",
+                    primo: {
+                        name: "Pasta con broccoletti", icon: "ramen_dining",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Broccoletti", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Pasta con pesto di basilico", icon: "ramen_dining",
+                            ingredients: [
+                                { name: "Pasta di semola", g: { infanzia: 60, primaria: 70, secondaria: 80 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                                { name: "Pesto di basilico", g: { infanzia: 5, primaria: 8, secondaria: 8 }, type: "pesto" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    },
+                    secondo: {
+                        name: "Polpette al pomodoro", icon: "dinner_dining",
+                        portionNote: { infanzia: "Porzione 60g", primaria: "Porzione 70g", secondaria: "Porzione 70g" },
+                        ingredients: [
+                            { name: "Manzo magro", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "manzo" },
+                            { name: "Pane", g: { infanzia: 10, primaria: 10, secondaria: 10 }, type: "pane", glutenFree: "Pane senza glutine" },
+                            { name: "Uova", g: { infanzia: 3, primaria: 3, secondaria: 3 }, type: "uovo" },
+                            { name: "Pomodoro", g: { infanzia: "q.b.", primaria: "q.b.", secondaria: "q.b." }, calcGrams: 30, type: "pomodoro" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 3, primaria: 3, secondaria: 4 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Zucca al forno", icon: "psychiatry",
+                        ingredients: [
+                            { name: "Zucca a tocchetti al forno", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Zucchine all'olio", icon: "grass",
+                            ingredients: [
+                                { name: "Zucchine all'olio", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    dayIndex: 3, dayName: "Giovedì",
+                    primo: {
+                        name: "Riso con minestrone", icon: "rice_bowl",
+                        ingredients: [
+                            { name: "Riso parboiled", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "riso" },
+                            { name: "Minestrone surgelato", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Pasta all'ortolana", icon: "ramen_dining",
+                            ingredients: [
+                                { name: "Pasta di semola", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                                { name: "Melanzane, peperoni, zucchine e pomodori", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                                { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    },
+                    secondo: {
+                        name: "Petto di pollo", icon: "dinner_dining",
+                        ingredients: [
+                            { name: "Petto di pollo", g: { infanzia: 50, primaria: 60, secondaria: 70 }, type: "tacchino" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 6 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Spinaci in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Spinaci", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 4, dayName: "Venerdì",
+                    primo: {
+                        name: "Pasta e piselli", icon: "soup_kitchen",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 50, primaria: 50, secondaria: 60 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Piselli", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "piselli" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Frittata di uova", icon: "egg_alt",
+                        ingredients: [
+                            { name: "Uovo intero", g: { infanzia: 50, primaria: 50, secondaria: 50 }, type: "uovo" },
+                            { name: "Parmigiano", g: { infanzia: 2, primaria: 3, secondaria: 3 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 3, primaria: 3, secondaria: 4 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Patate lesse o al forno", icon: "psychiatry",
+                        ingredients: [
+                            { name: "Patate", g: { infanzia: 80, primaria: 80, secondaria: 120 }, type: "patate" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                }
+            ],
+
+            4: [ // SETTIMANA 4
+                {
+                    dayIndex: 0, dayName: "Lunedì",
+                    primo: {
+                        name: "Pizza al pomodoro", icon: "local_pizza",
+                        ingredients: [
+                            { name: "Farina di grano tenero", g: { infanzia: 100, primaria: 120, secondaria: 140 }, type: "farina", glutenFree: "Farina senza glutine" },
+                            { name: "Parmigiano", g: { infanzia: 10, primaria: 15, secondaria: 20 }, type: "parmigiano" },
+                            { name: "Pomodoro", g: { infanzia: "q.b.", primaria: "q.b.", secondaria: "q.b." }, calcGrams: 50, type: "pomodoro" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Prosciutto cotto magro", icon: "dinner_dining",
+                        ingredients: [
+                            { name: "Prosciutto cotto magro", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "prosciutto", glutenFree: "Prosciutto senza glutine" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Finocchi in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Finocchi cotti o crudi", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ],
+                        springOverride: {
+                            name: "Pomodori in insalata", icon: "eco",
+                            ingredients: [
+                                { name: "Pomodori in insalata", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "pomodoro" },
+                                { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    dayIndex: 1, dayName: "Martedì",
+                    primo: {
+                        name: "Pasta e lenticchie", icon: "soup_kitchen",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 40, primaria: 40, secondaria: 50 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Lenticchie secche", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "legumi_sec" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Formaggio spalmabile", icon: "tapas",
+                        ingredients: [
+                            { name: "Formaggio spalmabile", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "form_fuso" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Bietoline in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Bietoline", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 2, dayName: "Mercoledì",
+                    primo: {
+                        name: "Pasta al pomodoro", icon: "ramen_dining",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 60, primaria: 70, secondaria: 80 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Pomodoro", g: { infanzia: "q.b.", primaria: "q.b.", secondaria: "q.b." }, calcGrams: 50, type: "pomodoro" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Filetti di merluzzo", icon: "set_meal",
+                        ingredients: [
+                            { name: "Filetti di merluzzo", g: { infanzia: 50, primaria: 60, secondaria: 70 }, type: "pesce_fil" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 6 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Cavolfiore gratinato al forno", icon: "psychiatry",
+                        ingredients: [
+                            { name: "Cavolfiore (cimette)", g: { infanzia: 100, primaria: 120, secondaria: 200 }, type: "verdura" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 4, secondaria: 5 }, type: "parmigiano" },
+                            { name: "Pan grattato", g: { infanzia: "q.b.", primaria: "q.b.", secondaria: "q.b." }, calcGrams: 8, type: "pane", glutenFree: "Pan grattato senza glutine" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 3, dayName: "Giovedì",
+                    primo: {
+                        name: "Pasta e fagioli", icon: "soup_kitchen",
+                        ingredients: [
+                            { name: "Pasta di semola", g: { infanzia: 40, primaria: 40, secondaria: 50 }, type: "pasta", glutenFree: "Pasta senza glutine" },
+                            { name: "Fagioli secchi", g: { infanzia: 30, primaria: 40, secondaria: 50 }, type: "legumi_sec" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Frittata di uova", icon: "egg_alt",
+                        ingredients: [
+                            { name: "Uovo intero", g: { infanzia: 50, primaria: 50, secondaria: 50 }, type: "uovo" },
+                            { name: "Parmigiano", g: { infanzia: 2, primaria: 3, secondaria: 3 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 3, primaria: 3, secondaria: 4 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Patate lesse o al forno", icon: "psychiatry",
+                        ingredients: [
+                            { name: "Patate", g: { infanzia: 80, primaria: 80, secondaria: 120 }, type: "patate" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                },
+                {
+                    dayIndex: 4, dayName: "Venerdì",
+                    primo: {
+                        name: "Riso con spinaci", icon: "rice_bowl",
+                        ingredients: [
+                            { name: "Riso parboiled", g: { infanzia: 50, primaria: 60, secondaria: 60 }, type: "riso" },
+                            { name: "Spinaci", g: { infanzia: 50, primaria: 60, secondaria: 100 }, type: "verdura" },
+                            { name: "Parmigiano", g: { infanzia: 3, primaria: 5, secondaria: 7 }, type: "parmigiano" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    },
+                    secondo: {
+                        name: "Hamburger di manzo", icon: "lunch_dining",
+                        ingredients: [
+                            { name: "Hamburger di manzo", g: { infanzia: 50, primaria: 60, secondaria: 70 }, type: "manzo" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 6 }, type: "olio" }
+                        ]
+                    },
+                    contorno: {
+                        name: "Lattuga o indivia in insalata", icon: "eco",
+                        ingredients: [
+                            { name: "Lattuga o indivia", g: { infanzia: 50, primaria: 70, secondaria: 150 }, type: "verdura" },
+                            { name: "Olio extravergine d'oliva", g: { infanzia: 5, primaria: 6, secondaria: 7 }, type: "olio" }
+                        ]
+                    }
+                }
+            ]
+        };
+
+        /*************************************************************************
+         * 2. STATO DELL'APPLICAZIONE E LOGICA DEL CALENDARIO (SETTIMANA 2 = OGGI)
+         *************************************************************************/
+        function getMondayOfDate(d) {
+            const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(date.setDate(diff));
+        }
+
+        const rawToday = new Date();
+        const baseMonday = getMondayOfDate(rawToday);
+        const defaultWeekOffset = (rawToday.getDay() === 0 || rawToday.getDay() === 6) ? 1 : 0;
+        const initialDayIndex = (rawToday.getDay() >= 1 && rawToday.getDay() <= 5) ? (rawToday.getDay() - 1) : 0;
+
+        const state = {
+            viewMode: 'week',         // 'week' (home) | 'day' (dettaglio giorno) | 'week' (Tutta la settimana)
+            school: 'infanzia',       // Default: Scuola dell'Infanzia
+            season: ((rawToday.getMonth() > 2 || (rawToday.getMonth() === 2 && rawToday.getDate() >= 21)) && (rawToday.getMonth() < 9 || (rawToday.getMonth() === 9 && rawToday.getDate() < 22))) ? 'spring' : 'winter',
+            celiachia: false,         // Prodotti senza glutine
+            macroMode: 'daily',       // 'daily' | 'asl'
+            weekOffset: (rawToday.getDay() === 0 || rawToday.getDay() === 6) ? 1 : 0,
+            selectedDayIndex: initialDayIndex
+        };
+
+        function getMenuWeekNumber(offset) {
+            return (((1 + offset) % 4) + 4) % 4 + 1;
+        }
+
+        function getDateForSlot(weekOffset, dayIndex) {
+            const d = new Date(baseMonday);
+            d.setDate(d.getDate() + (weekOffset * 7) + dayIndex);
+            return d;
+        }
+
+        function isSameCalendarDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                   d1.getMonth() === d2.getMonth() &&
+                   d1.getDate() === d2.getDate();
+        }
+
+        function resolveDishForSeason(dishObj) {
+            if (state.season === 'spring' && dishObj.springOverride) {
+                return dishObj.springOverride;
+            }
+            return dishObj;
+        }
+
+        /*************************************************************************
+         * 3. CALCOLO DINAMICO QUANTITÀ E MACRONUTRIENTI DEL GIORNO
+         *************************************************************************/
+        function calculateDayNutrition(dayMenu, schoolKey) {
+            let totalGrams = 0;
+            let kcal = 0;
+            let carb = 0;
+            let prot = 0;
+            let fat = 0;
+
+            const courses = [
+                resolveDishForSeason(dayMenu.primo),
+                resolveDishForSeason(dayMenu.secondo),
+                resolveDishForSeason(dayMenu.contorno)
+            ];
+
+            courses.forEach(course => {
+                course.ingredients.forEach(ing => {
+                    let gVal = ing.g[schoolKey];
+                    let numericGrams = 0;
+                    if (typeof gVal === 'number') {
+                        numericGrams = gVal;
+                    } else if (ing.calcGrams) {
+                        numericGrams = typeof ing.calcGrams === 'object' ? ing.calcGrams[schoolKey] : ing.calcGrams;
+                    }
+                    totalGrams += numericGrams;
+
+                    const macroRef = FOOD_MACROS_PER_100G[ing.type];
+                    if (macroRef && numericGrams > 0) {
+                        const factor = numericGrams / 100;
+                        kcal += macroRef.kcal * factor;
+                        carb += macroRef.carb * factor;
+                        prot += macroRef.prot * factor;
+                        fat  += macroRef.fat  * factor;
+                    }
+                });
+            });
+
+            const target = ASL_OFFICIAL_TARGETS[schoolKey];
+            totalGrams += target.breadGrams + target.fruitGrams;
+
+            kcal += (FOOD_MACROS_PER_100G.pane.kcal * target.breadGrams) / 100;
+            carb += (FOOD_MACROS_PER_100G.pane.carb * target.breadGrams) / 100;
+            prot += (FOOD_MACROS_PER_100G.pane.prot * target.breadGrams) / 100;
+            fat  += (FOOD_MACROS_PER_100G.pane.fat  * target.breadGrams) / 100;
+
+            kcal += (FOOD_MACROS_PER_100G.frutta.kcal * target.fruitGrams) / 100;
+            carb += (FOOD_MACROS_PER_100G.frutta.carb * target.fruitGrams) / 100;
+            prot += (FOOD_MACROS_PER_100G.frutta.prot * target.fruitGrams) / 100;
+            fat  += (FOOD_MACROS_PER_100G.frutta.fat  * target.fruitGrams) / 100;
+
+            const totalMacroEnergy = (carb * 4) + (prot * 4) + (fat * 9) || 1;
+            const carbPct = Math.round(((carb * 4) / totalMacroEnergy) * 100);
+            const protPct = Math.round(((prot * 4) / totalMacroEnergy) * 100);
+            const fatPct  = Math.max(0, 100 - carbPct - protPct);
+
+            return {
+                totalGrams: Math.round(totalGrams),
+                kcal: Math.round(kcal),
+                carbGrams: Math.round(carb),
+                protGrams: Math.round(prot),
+                fatGrams: Math.round(fat),
+                carbPct,
+                protPct,
+                fatPct
+            };
+        }
+
+        /*************************************************************************
+         * 4. RENDERING INTERFACCIA MATERIAL DESIGN 3 (ZERO EMOJI)
+         *************************************************************************/
+        function renderApp() {
+            const activeWeekNum = getMenuWeekNumber(state.weekOffset);
+            const weekMenu = MENU_DATA[activeWeekNum];
+            const activeDayMenu = weekMenu[state.selectedDayIndex];
+            const selectedDate = getDateForSlot(state.weekOffset, state.selectedDayIndex);
+            const isSelectedToday = isSameCalendarDay(selectedDate, rawToday);
+            const schoolInfo = ASL_OFFICIAL_TARGETS[state.school];
+
+            // 1. Aggiorna Segmented Control in alto (Oggi/Giorno vs Tutta la Settimana)
+            const tabDay = document.getElementById('viewTab-day');
+            const tabWeek = document.getElementById('viewTab-week');
+            const secDay = document.getElementById('dayViewSection');
+            const secWeek = document.getElementById('weekViewSection');
+
+            if (state.viewMode === 'day') {
+                tabDay.className = "m3-btn py-2 px-3 rounded-pill text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 bg-md-surface text-md-textMain shadow-sm";
+                tabWeek.className = "m3-btn py-2 px-3 rounded-pill text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-md-textSub hover:text-md-textMain";
+                secDay.classList.remove('hidden');
+                secWeek.classList.add('hidden');
+            } else {
+                tabWeek.className = "m3-btn py-2 px-3 rounded-pill text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 bg-md-surface text-md-textMain shadow-sm";
+                tabDay.className = "m3-btn py-2 px-3 rounded-pill text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-md-textSub hover:text-md-textMain";
+                secWeek.classList.remove('hidden');
+                secDay.classList.add('hidden');
+            }
+
+            // 2. Aggiorna Pill Profilo nell'Header (con icone Material Symbols)
+            document.getElementById('headerSchoolIcon').textContent = schoolInfo.icon;
+            document.getElementById('headerSchoolLabel').textContent = schoolInfo.shortLabel;
+            document.getElementById('headerSeasonIcon').textContent = state.season === 'winter' ? 'ac_unit' : 'wb_sunny';
+            const glutenHeaderIcon = document.getElementById('headerGlutenIcon');
+            if (state.celiachia) {
+                glutenHeaderIcon.classList.remove('hidden');
+            } else {
+                glutenHeaderIcon.classList.add('hidden');
+            }
+
+            // 3. Aggiorna controlli dentro il Bottom Sheet Impostazioni
+            ['infanzia', 'primaria', 'secondaria'].forEach(key => {
+                const btn = document.getElementById(`school-${key}`);
+                if (state.school === key) {
+                    btn.className = "m3-btn p-3 rounded-3xl flex flex-col items-center gap-1 border border-md-primary bg-md-primaryContainer text-md-onPrimaryContainer text-center shadow-sm";
+                } else {
+                    btn.className = "m3-btn p-3 rounded-3xl flex flex-col items-center gap-1 border border-black/5 dark:border-white/5 bg-md-surfaceContainer text-md-textSub text-center";
+                }
+            });
+
+            const winBtn = document.getElementById('season-winter');
+            const sprBtn = document.getElementById('season-spring');
+            if (state.season === 'winter') {
+                winBtn.className = "m3-btn p-3 rounded-3xl flex items-center gap-2.5 border border-md-primary bg-md-primaryContainer text-md-onPrimaryContainer text-left shadow-sm";
+                sprBtn.className = "m3-btn p-3 rounded-3xl flex items-center gap-2.5 border border-black/5 dark:border-white/5 bg-md-surfaceContainer text-md-textSub text-left";
+            } else {
+                sprBtn.className = "m3-btn p-3 rounded-3xl flex items-center gap-2.5 border border-md-primary bg-md-primaryContainer text-md-onPrimaryContainer text-left shadow-sm";
+                winBtn.className = "m3-btn p-3 rounded-3xl flex items-center gap-2.5 border border-black/5 dark:border-white/5 bg-md-surfaceContainer text-md-textSub text-left";
+            }
+
+            const celBtn = document.getElementById('btnCeliachia');
+            if (state.celiachia) {
+                celBtn.textContent = "Attivo";
+                celBtn.className = "m3-btn px-4 py-2 rounded-pill text-xs font-extrabold bg-md-primary text-md-onPrimary shadow-sm shrink-0";
+            } else {
+                celBtn.textContent = "Disattivo";
+                celBtn.className = "m3-btn px-4 py-2 rounded-pill text-xs font-bold bg-md-surface text-md-textSub border border-md-outline/30 shrink-0";
+            }
+
+            // 4. Aggiorna Intestazione Calendario Settimanale
+            const monDate = getDateForSlot(state.weekOffset, 0);
+            const friDate = getDateForSlot(state.weekOffset, 4);
+            const fmtShort = new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short' });
+            document.getElementById('weekRangeLabel').textContent = `${fmtShort.format(monDate)} – ${fmtShort.format(friDate)}`;
+            document.getElementById('currentWeekBadgeText').textContent = `${activeWeekNum}ª Settimana`;
+
+            const btnQuickToday = document.getElementById('btnQuickToday');
+            if (state.weekOffset !== 0 || state.selectedDayIndex !== initialDayIndex) {
+                btnQuickToday.classList.remove('hidden');
+                btnQuickToday.classList.add('inline-flex');
+            } else {
+                btnQuickToday.classList.add('hidden');
+                btnQuickToday.classList.remove('inline-flex');
+            }
+
+            // 5. Renderizza Barra Orizzontale dei Giorni (Lun - Ven)
+            const stripEl = document.getElementById('dayStripContainer');
+            stripEl.innerHTML = '';
+            const dayShortNames = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven'];
+
+            for (let i = 0; i < 5; i++) {
+                const d = getDateForSlot(state.weekOffset, i);
+                const isToday = isSameCalendarDay(d, rawToday);
+                const isSelected = (i === state.selectedDayIndex);
+                const dayMenuPreview = resolveDishForSeason(weekMenu[i].primo);
+
+                const btn = document.createElement('button');
+                btn.onclick = () => selectDay(i);
+                btn.className = `m3-btn py-2.5 px-1.5 sm:p-3 rounded-3xl flex flex-col items-center justify-between text-center border transition-all ${
+                    isSelected 
+                        ? 'bg-md-primaryContainer text-md-onPrimaryContainer border-md-primary/30 shadow-sm scale-[1.02]' 
+                        : 'bg-md-surfaceContainer/70 hover:bg-md-surfaceHigh text-md-textMain border-transparent'
+                } ${isToday ? 'today-ring' : ''}`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-1">
+                        <span class="text-[11px] font-bold uppercase tracking-wider opacity-80">${dayShortNames[i]}</span>
+                        ${isToday ? `<span class="w-1.5 h-1.5 rounded-full bg-md-primary"></span>` : ''}
+                    </div>
+                    <span class="text-lg sm:text-xl font-extrabold my-0.5">${d.getDate()}</span>
+                    <span class="text-[10px] font-semibold line-clamp-1 opacity-85 hidden sm:block">${dayMenuPreview.name}</span>
+                    ${isToday ? `<span class="text-[10px] font-extrabold uppercase text-md-primary">Oggi</span>` : `<span class="sm:hidden material-symbols-rounded text-[14px] opacity-60">${dayMenuPreview.icon}</span>`}
+                `;
+                stripEl.appendChild(btn);
+            }
+
+            // 6. Renderizza HERO CARD del Giorno Selezionato
+            const todayBadge = document.getElementById('heroTodayBadge');
+            if (isSelectedToday) {
+                todayBadge.classList.remove('hidden');
+                todayBadge.classList.add('inline-flex');
+            } else {
+                todayBadge.classList.add('hidden');
+                todayBadge.classList.remove('inline-flex');
+            }
+
+            document.getElementById('heroSchoolBadgeIcon').textContent = schoolInfo.icon;
+            document.getElementById('heroSchoolBadgeText').textContent = `Porzioni ${schoolInfo.shortLabel}`;
+
+            const heroCeliachiaBadge = document.getElementById('heroCeliachiaBadge');
+            if (state.celiachia) {
+                heroCeliachiaBadge.classList.remove('hidden');
+                heroCeliachiaBadge.classList.add('inline-flex');
+            } else {
+                heroCeliachiaBadge.classList.add('hidden');
+                heroCeliachiaBadge.classList.remove('inline-flex');
+            }
+
+            const fullDateFmt = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('heroDateTitle').textContent = fullDateFmt.format(selectedDate);
+
+            // Renderizza le 3 portate principali + grammature nella Hero Card
+            const dishesContainer = document.getElementById('dishesListContainer');
+            dishesContainer.innerHTML = `<div class="flex justify-between px-1 text-[11px] font-extrabold uppercase tracking-wider text-md-textSub"><span>Ingredienti a crudo</span><span>Quantità per ${schoolInfo.shortLabel}</span></div>`;
+
+            const courseConfigs = [
+                { key: 'primo', label: 'Primo Piatto', badgeBg: 'bg-amber-500/15 text-amber-900 dark:text-amber-200', iconBg: 'bg-amber-100 text-amber-700', data: resolveDishForSeason(activeDayMenu.primo) },
+                { key: 'secondo', label: 'Secondo Piatto', badgeBg: 'bg-rose-500/15 text-rose-900 dark:text-rose-200', iconBg: 'bg-rose-100 text-rose-600', data: resolveDishForSeason(activeDayMenu.secondo) },
+                { key: 'contorno', label: 'Contorno', badgeBg: 'bg-emerald-500/15 text-emerald-900 dark:text-emerald-200', iconBg: 'bg-emerald-100 text-emerald-700', data: resolveDishForSeason(activeDayMenu.contorno) }
+            ];
+
+            courseConfigs.forEach(course => {
+                const dish = course.data;
+                const portionLabel = dish.portionNote ? dish.portionNote[state.school] : null;
+
+                let courseGrams = 0;
+                dish.ingredients.forEach(ing => {
+                    const g = ing.g[state.school];
+                    if (typeof g === 'number') courseGrams += g;
+                    else if (ing.calcGrams) {
+                        courseGrams += typeof ing.calcGrams === 'object' ? ing.calcGrams[state.school] : ing.calcGrams;
+                    }
+                });
+
+                const ingredientsHtml = dish.ingredients.map(ing => {
+                    const gramValue = ing.g[state.school];
+                    const gramFormatted = typeof gramValue === 'number' ? `${gramValue} g` : gramValue;
+                    const showGlutenFree = state.celiachia && ing.glutenFree;
+
+                    return `
+                        <div class="flex items-center justify-between py-1.5 border-b last:border-b-0 border-black/5 dark:border-white/5 text-xs sm:text-sm">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="font-medium text-md-textSub">${ing.name}</span>
+                                ${showGlutenFree ? `
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-pill text-[11px] font-bold bg-amber-200/80 text-amber-950 dark:bg-amber-500/30 dark:text-amber-100">
+                                        <span class="material-symbols-rounded text-[13px]">verified</span>
+                                        <span>${ing.glutenFree}</span>
+                                    </span>
+                                ` : ''}
+                            </div>
+                            <span class="font-extrabold text-md-textMain shrink-0 ml-2 px-2.5 py-0.5 rounded-pill bg-md-surface">${gramFormatted}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                const card = document.createElement('div');
+                card.className = `dish-card c-${course.key} p-4 rounded-[28px]`;
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2 mb-2.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl ${course.iconBg} flex items-center justify-center shadow-sm shrink-0">
+                                <span class="material-symbols-rounded text-[26px]">${dish.icon}</span>
+                            </div>
+                            <div>
+                                <span class="block text-[11px] font-extrabold uppercase tracking-wider text-md-textSub mb-0.5">
+                                    ${course.label}
+                                </span>
+                                <h4 class="text-lg sm:text-xl font-semibold text-md-textMain leading-snug">${dish.name}</h4>
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <span class="text-xs font-extrabold px-2.5 py-1 rounded-pill bg-md-primaryContainer/60 text-md-onPrimaryContainer">
+                                ${portionLabel ? portionLabel : `${courseGrams} g totali`}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bg-md-surfaceContainer/50 rounded-2xl px-3.5 py-1">${ingredientsHtml}</div>
+                `;
+                dishesContainer.appendChild(card);
+            });
+
+            // 7. Renderizza Dotazione Fissa Giornaliera (Panino, Frutta, Acqua) con icone Material
+            const fixedExtrasEl = document.getElementById('dailyFixedExtras');
+            fixedExtrasEl.innerHTML = `
+                <div class="p-3 rounded-2xl bg-md-surfaceContainer text-center">
+                    <span class="material-symbols-rounded text-amber-600 text-[22px]">bakery_dining</span>
+                    <p class="text-xs font-extrabold text-md-textMain mt-0.5">Panino</p>
+                    <span class="text-xs font-bold text-md-primary block">${schoolInfo.breadGrams} g</span>
+                    ${state.celiachia ? `<span class="text-[10px] font-bold text-amber-700 dark:text-amber-300 block mt-0.5">Senza glutine</span>` : ''}
+                </div>
+                <div class="p-3 rounded-2xl bg-md-surfaceContainer text-center">
+                    <span class="material-symbols-rounded text-md-primary text-rose-500 text-[22px]">nutrition</span>
+                    <p class="text-xs font-extrabold text-md-textMain mt-0.5">Frutta</p>
+                    <span class="text-xs font-bold text-md-primary block">${schoolInfo.fruitGrams} g</span>
+                </div>
+                <div class="p-3 rounded-2xl bg-md-surfaceContainer text-center">
+                    <span class="material-symbols-rounded text-sky-500 text-[22px]">water_full</span>
+                    <p class="text-xs font-extrabold text-md-textMain mt-0.5">Acqua</p>
+                    <span class="text-xs font-bold text-md-primary block">500 ml</span>
+                </div>
+            `;
+
+            // 8. Renderizza Pannello Nutrizione & Macronutrienti
+            const dayCalc = calculateDayNutrition(activeDayMenu, state.school);
+            const btnDaily = document.getElementById('macroBtn-daily');
+            const btnAsl = document.getElementById('macroBtn-asl');
+
+            if (state.macroMode === 'daily') {
+                btnDaily.className = "px-2.5 py-1 rounded-pill transition-all bg-md-primary text-md-onPrimary shadow-sm";
+                btnAsl.className = "px-2.5 py-1 rounded-pill transition-all text-md-textSub";
+                document.getElementById('macroSubtitle').textContent = `Stima sulle grammature di ${activeDayMenu.dayName}`;
+                document.getElementById('statKcal').textContent = dayCalc.kcal;
+                document.getElementById('statKcalNote').textContent = `Media ASL ${schoolInfo.shortLabel}: ${schoolInfo.kcal} kcal`;
+                document.getElementById('statTotalGrams').textContent = dayCalc.totalGrams;
+
+                document.getElementById('macroCarbText').textContent = `${dayCalc.carbGrams}g • ${dayCalc.carbPct}%`;
+                document.getElementById('macroCarbBar').style.width = `${dayCalc.carbPct}%`;
+
+                document.getElementById('macroProtText').textContent = `${dayCalc.protGrams}g • ${dayCalc.protPct}%`;
+                document.getElementById('macroProtBar').style.width = `${dayCalc.protPct}%`;
+
+                document.getElementById('macroFatText').textContent = `${dayCalc.fatGrams}g • ${dayCalc.fatPct}%`;
+                document.getElementById('macroFatBar').style.width = `${dayCalc.fatPct}%`;
+            } else {
+                btnAsl.className = "px-2.5 py-1 rounded-pill transition-all bg-md-primary text-md-onPrimary shadow-sm";
+                btnDaily.className = "px-2.5 py-1 rounded-pill transition-all text-md-textSub";
+                document.getElementById('macroSubtitle').textContent = `Computo nutrizionale medio ASL (${schoolInfo.shortLabel})`;
+                document.getElementById('statKcal').textContent = schoolInfo.kcal;
+                document.getElementById('statKcalNote').textContent = `Giorno specifico: ~${dayCalc.kcal} kcal`;
+                document.getElementById('statTotalGrams').textContent = dayCalc.totalGrams;
+
+                document.getElementById('macroCarbText').textContent = `${schoolInfo.carbGrams}g • ${schoolInfo.carbPct}%`;
+                document.getElementById('macroCarbBar').style.width = `${schoolInfo.carbPct}%`;
+
+                document.getElementById('macroProtText').textContent = `${schoolInfo.protGrams}g • ${schoolInfo.protPct}%`;
+                document.getElementById('macroProtBar').style.width = `${schoolInfo.protPct}%`;
+
+                document.getElementById('macroFatText').textContent = `${schoolInfo.fatGrams}g • ${schoolInfo.fatPct}%`;
+                document.getElementById('macroFatBar').style.width = `${schoolInfo.fatPct}%`;
+            }
+
+            document.getElementById('microSchoolName').textContent = schoolInfo.shortLabel;
+            document.getElementById('microFiber').textContent = schoolInfo.fiber;
+            document.getElementById('microIron').textContent = schoolInfo.iron;
+            document.getElementById('microCalcium').textContent = schoolInfo.calcium;
+
+            // 9. Renderizza Vista "Tutta la Settimana" (Tabs 1ª-4ª + Cards Lun-Ven)
+            for (let w = 1; w <= 4; w++) {
+                const wBtn = document.getElementById(`wkBtn-${w}`);
+                if (w === activeWeekNum) {
+                    wBtn.className = "m3-btn py-2 rounded-pill text-xs font-extrabold bg-md-primary text-md-onPrimary shadow-sm";
+                } else {
+                    wBtn.className = "m3-btn py-2 rounded-pill text-xs font-bold text-md-textSub hover:text-md-textMain";
+                }
+            }
+
+            document.getElementById('weekViewSubLabel').textContent = `${activeWeekNum}ª Settimana (${fmtShort.format(monDate)} – ${fmtShort.format(friDate)}) • Porzioni ${schoolInfo.shortLabel}`;
+
+            const overviewGrid = document.getElementById('weekOverviewGrid');
+            overviewGrid.innerHTML = '';
+
+            weekMenu.forEach((dayItem, idx) => {
+                const d = getDateForSlot(state.weekOffset, idx);
+                const isToday = isSameCalendarDay(d, rawToday);
+                const isSelected = (idx === state.selectedDayIndex);
+                const p = resolveDishForSeason(dayItem.primo);
+                const s = resolveDishForSeason(dayItem.secondo);
+                const c = resolveDishForSeason(dayItem.contorno);
+                const dayMacros = calculateDayNutrition(dayItem, state.school);
+
+                const card = document.createElement('div');
+                card.onclick = () => {
+                    state.selectedDayIndex = idx;
+                    state.viewMode = 'day';
+                    renderApp();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+                card.setAttribute('role','button'); card.tabIndex = 0; card.onkeydown = (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); card.onclick(); } };
+                const todayMid = new Date(rawToday.getFullYear(), rawToday.getMonth(), rawToday.getDate());
+                const isPast = !isToday && d < todayMid;
+                const isTomorrow = isSameCalendarDay(d, new Date(rawToday.getFullYear(), rawToday.getMonth(), rawToday.getDate() + 1));
+                const isNext = !isToday && !isTomorrow && !isPast && state.weekOffset === defaultWeekOffset && idx === ((rawToday.getDay() === 0 || rawToday.getDay() === 6) ? 0 : -1);
+                card.className = `m3-card day-card p-4 cursor-pointer border transition-all ${isToday ? 'today-strong' : ''} ${(isTomorrow || isNext) ? 'tomorrow-soft' : ''} ${isPast ? 'day-past' : ''} ${
+                    isToday 
+                        ? 'ring-2 ring-md-primary bg-md-primaryContainer/50 border-md-primary/40' 
+                        : isSelected
+                            ? 'border-md-primary/40 bg-md-surface'
+                            : 'border-black/5 dark:border-white/5 hover:bg-md-surfaceContainer/40'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm sm:text-base font-extrabold text-md-textMain">${dayItem.dayName}</span>
+                            ${isToday
+                                ? `<span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-md-primary text-md-onPrimary text-base font-extrabold shadow-sm">${d.getDate()}</span><span class="text-xs font-bold text-md-textSub">${new Intl.DateTimeFormat('it-IT', { month: 'short' }).format(d)}</span>`
+                                : `<span class="text-xs font-bold text-md-textSub">${d.getDate()} ${new Intl.DateTimeFormat('it-IT', { month: 'short' }).format(d)}</span>`}
+                            ${isToday ? `
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-[11px] font-extrabold tracking-wide bg-md-primary text-md-onPrimary shadow-sm">
+                                    <span class="today-dot"></span>
+                                    <span>OGGI</span>
+                                </span>
+                            ` : ''}
+                            ${(isTomorrow || isNext) ? `
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-pill text-[10px] font-extrabold tracking-wide bg-md-secondaryContainer text-md-onSecondaryContainer">
+                                    <span class="material-symbols-rounded text-[13px]">${isTomorrow ? 'event_upcoming' : 'arrow_forward'}</span>
+                                    <span>${isTomorrow ? 'DOMANI' : 'PROSSIMO'}</span>
+                                </span>
+                            ` : ''}
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold text-md-textSub">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-pill bg-md-surfaceContainer text-md-textMain">
+                                <span class="material-symbols-rounded text-[14px] text-md-primary">local_fire_department</span>
+                                <span>~${dayMacros.kcal} kcal</span>
+                            </span>
+                            <span class="chev material-symbols-rounded text-[18px] text-md-primary">chevron_right</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div class="p-2.5 rounded-2xl bg-md-surfaceContainer/75 flex items-center gap-2.5">
+                            <span class="material-symbols-rounded text-[20px] text-amber-600 dark:text-amber-400 shrink-0">${p.icon}</span>
+                            <div class="min-w-0">
+                                <span class="text-[10px] font-bold uppercase text-md-textSub block">Primo</span>
+                                <p class="font-extrabold text-md-textMain truncate">${p.name}</p>
+                            </div>
+                        </div>
+                        <div class="p-2.5 rounded-2xl bg-md-surfaceContainer/75 flex items-center gap-2.5">
+                            <span class="material-symbols-rounded text-[20px] text-rose-600 dark:text-rose-400 shrink-0">${s.icon}</span>
+                            <div class="min-w-0">
+                                <span class="text-[10px] font-bold uppercase text-md-textSub block">Secondo</span>
+                                <p class="font-extrabold text-md-textMain truncate">${s.name}</p>
+                            </div>
+                        </div>
+                        <div class="p-2.5 rounded-2xl bg-md-surfaceContainer/75 flex items-center gap-2.5">
+                            <span class="material-symbols-rounded text-[20px] text-emerald-600 dark:text-emerald-400 shrink-0">${c.icon}</span>
+                            <div class="min-w-0">
+                                <span class="text-[10px] font-bold uppercase text-md-textSub block">Contorno</span>
+                                <p class="font-extrabold text-md-textMain truncate">${c.name}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                overviewGrid.appendChild(card);
+            });
+        }
+
+        /*************************************************************************
+         * 5. AZIONI INTERATTIVE UTENTE & SWIPE MOBILE
+         *************************************************************************/
+        function setViewMode(mode) {
+            state.viewMode = mode;
+            renderApp();
+        }
+
+        function setSchool(schoolKey) {
+            state.school = schoolKey;
+            renderApp();
+        }
+
+        function setSeason(seasonKey) {
+            state.season = seasonKey;
+            renderApp();
+        }
+
+        function toggleCeliachia() {
+            state.celiachia = !state.celiachia;
+            renderApp();
+        }
+
+        function setMacroMode(mode) {
+            state.macroMode = mode;
+            renderApp();
+        }
+
+        function selectDay(dayIdx) {
+            state.selectedDayIndex = dayIdx;
+            renderApp();
+        }
+
+        function stepDay(delta) {
+            let nextDay = state.selectedDayIndex + delta;
+            if (nextDay > 4) {
+                state.weekOffset += 1;
+                state.selectedDayIndex = 0;
+            } else if (nextDay < 0) {
+                state.weekOffset -= 1;
+                state.selectedDayIndex = 4;
+            } else {
+                state.selectedDayIndex = nextDay;
+            }
+            renderApp();
+        }
+
+        function changeCalendarWeek(deltaWeeks) {
+            state.weekOffset += deltaWeeks;
+            renderApp();
+        }
+
+        function jumpToMenuWeek(targetWeekNum) {
+            const currentMenuWeek = getMenuWeekNumber(state.weekOffset);
+            const diff = targetWeekNum - currentMenuWeek;
+            state.weekOffset += diff;
+            renderApp();
+        }
+
+        function resetToToday() {
+            state.weekOffset = defaultWeekOffset;
+            state.selectedDayIndex = initialDayIndex;
+            state.viewMode = 'day';
+            renderApp();
+        }
+
+        function toggleSettingsSheet(show) {
+            const sheet = document.getElementById('settingsSheet');
+            if (show) {
+                sheet.classList.remove('hidden');
+                sheet.classList.add('flex');
+            } else {
+                sheet.classList.add('hidden');
+                sheet.classList.remove('flex');
+            }
+        }
+
+        function toggleInfoModal(show) {
+            const modal = document.getElementById('infoModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+
+        /* ===== UX: home settimana, calendario, ricerca, chiusure scolastiche, installazione, animazioni ===== */
+
+        // GIORNI SENZA MENSA - calendario scolastico Regione Campania A.S. 2026/2027 (DGR n. 199 del 20/05/2026).
+        // Il servizio mensa a Sorrento è partito il 9 novembre 2026. I singoli istituti possono adattare il calendario:
+        // aggiungi qui eventuali chiusure aggiuntive nel formato 'AAAA-MM-GG': 'Motivo'.
+        // Nota: il patrono di Sorrento (Sant'Antonino, 14 febbraio) nel 2027 cade di domenica, quindi non aggiunge chiusure.
+        const CLOSED_DAYS = {
+            '2026-11-02': 'Commemorazione dei defunti',
+            '2026-12-07': "Ponte dell'Immacolata",
+            '2026-12-08': 'Immacolata Concezione',
+            '2026-12-25': 'Natale',
+            '2027-01-01': 'Capodanno',
+            '2027-01-06': 'Epifania',
+            '2027-02-08': 'Vacanze di Carnevale',
+            '2027-02-09': 'Vacanze di Carnevale',
+            '2027-03-25': 'Vacanze di Pasqua',
+            '2027-03-26': 'Vacanze di Pasqua',
+            '2027-03-29': "Lunedì dell'Angelo",
+            '2027-03-30': 'Vacanze di Pasqua',
+            '2027-06-02': 'Festa della Repubblica'
+        };
+        const CLOSED_RANGES = [
+            { from: '2026-12-23', to: '2027-01-06', label: 'Vacanze di Natale' }
+        ];
+        const LESSONS_END_PRIMARY = '2027-06-08';   // fine lezioni primaria e secondaria
+        const LESSONS_END_INFANZIA = '2027-06-30';  // fine attività scuola dell'infanzia
+        function dateKey(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        function closedLabel(d) {
+            const k = dateKey(d);
+            if (CLOSED_DAYS[k]) return CLOSED_DAYS[k];
+            for (const r of CLOSED_RANGES) if (k >= r.from && k <= r.to) return r.label;
+            if (k > LESSONS_END_INFANZIA) return 'Fine anno scolastico';
+            if (k > LESSONS_END_PRIMARY && state.school !== 'infanzia') return 'Fine delle lezioni';
+            return null;
+        }
+
+        function menuForDate(d) {
+            const off = offsetForDate(d);
+            return { off, idx: (d.getDay() + 6) % 7, menu: MENU_DATA[getMenuWeekNumber(off)][(d.getDay() + 6) % 7] };
+        }
+        function openMenuDay(off, idx) {
+            state.weekOffset = off; state.selectedDayIndex = idx; state.viewMode = 'day';
+            renderApp();
+        }
+        function renderHome() {
+            const root = document.getElementById('homeSection');
+            const box = document.getElementById('homeContent');
+            const show = state.viewMode === 'week';
+            root.classList.toggle('hidden', !show);
+            if (!show) return;
+            if (!root.dataset.init) { const ib = document.getElementById('installBanner'); if (ib) root.prepend(ib); root.dataset.init = '1'; }
+
+            const fmtDate = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+            const fmtMon = new Intl.DateTimeFormat('it-IT', { month: 'short' });
+            const fmtShort = new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short' });
+            const dayShort = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven'];
+            const courses = [['primo', 'Primo', 'ic-primo'], ['secondo', 'Secondo', 'ic-secondo'], ['contorno', 'Contorno', 'ic-contorno']];
+            const mid = (n) => new Date(rawToday.getFullYear(), rawToday.getMonth(), rawToday.getDate() + n);
+
+            const bigCard = (d, kind, chipText, chipIcon) => {
+                const { off, idx, menu } = menuForDate(d);
+                const lab = closedLabel(d);
+                const chip = `<span class="hchip ${kind === 'today' ? 'bg-md-primary text-md-onPrimary' : 'bg-md-secondaryContainer text-md-onSecondaryContainer'}"><span class="material-symbols-rounded text-[16px]">${chipIcon}</span>${chipText}</span>`;
+                const head = `<div class="hday">${chip}<span class="hdate">${fmtDate.format(d)}</span></div>`;
+                if (lab) return `<div class="hcard closed">${head}<div class="flex items-center gap-3"><span class="material-symbols-rounded text-[34px]">event_busy</span><div><b class="font-display text-xl font-semibold block">Scuole chiuse</b><span class="text-sm font-bold opacity-80">${lab}</span></div></div></div>`;
+                const rows = courses.map(([k, label, ic]) => { const dish = resolveDishForSeason(menu[k]); return `<div class="hdish"><span class="ico ${ic}"><span class="material-symbols-rounded">${dish.icon}</span></span><div class="min-w-0"><small>${label}</small><b>${dish.name}</b></div></div>`; }).join('');
+                return `<button class="hcard ${kind}" onclick="openMenuDay(${off}, ${idx})" aria-label="Dettagli del menu di ${fmtDate.format(d)}">${head}${rows}</button>`;
+            };
+            const weekendCard = (d, chipText) => `<div class="hcard rest"><div class="hday"><span class="hchip bg-md-secondaryContainer text-md-onSecondaryContainer"><span class="material-symbols-rounded text-[16px]">weekend</span>${chipText}</span><span class="hdate">${fmtDate.format(d)}</span></div><div class="flex items-center gap-3 text-md-textSub font-bold"><span class="material-symbols-rounded text-[30px]">celebration</span>Weekend: niente mensa</div></div>`;
+
+            const today = mid(0), tomorrow = mid(1);
+            const isWk = (d) => d.getDay() === 0 || d.getDay() === 6;
+            let html = '';
+            html += `<div><div class="home-label"><span class="material-symbols-rounded text-md-primary">today</span>Oggi</div>${isWk(today) ? weekendCard(today, 'Oggi') : bigCard(today, 'today', 'Oggi', 'stars')}</div>`;
+            html += `<div><div class="home-label"><span class="material-symbols-rounded text-md-primary">event_upcoming</span>Domani</div>${isWk(tomorrow) ? weekendCard(tomorrow, 'Domani') : bigCard(tomorrow, 'tomorrow', 'Domani', 'event_upcoming')}</div>`;
+            const shown = [];
+            if (isWk(tomorrow)) {
+                const nxt = mid(today.getDay() === 6 ? 2 : today.getDay() === 5 ? 3 : 1);
+                if (!isWk(nxt) && dateKey(nxt) !== dateKey(tomorrow)) {
+                    html += `<div><div class="home-label"><span class="material-symbols-rounded text-md-primary">arrow_forward</span>Lunedì, si riparte</div>${bigCard(nxt, 'tomorrow', 'Lunedì', 'restaurant')}</div>`;
+                    shown.push(dateKey(nxt));
+                }
+            }
+            if (!isWk(today)) shown.push(dateKey(today));
+            if (!isWk(tomorrow)) shown.push(dateKey(tomorrow));
+
+            const monDate = getDateForSlot(state.weekOffset, 0), friDate = getDateForSlot(state.weekOffset, 4);
+            const wkNum = getMenuWeekNumber(state.weekOffset);
+            const isCurWeek = state.weekOffset === defaultWeekOffset;
+            const items = [];
+            for (let i = 0; i < 5; i++) {
+                const d = getDateForSlot(state.weekOffset, i);
+                if (shown.includes(dateKey(d))) continue;
+                const menu = MENU_DATA[wkNum][i];
+                const lab = closedLabel(d);
+                const past = d < today;
+                if (past && state.weekOffset === offsetForDate(today)) continue;
+                if (lab) { items.push(`<div class="rrow closed" style="${past ? 'opacity:.6' : ''}"><div class="dbox" style="background:rgba(255,255,255,.6)"><span>${dayShort[i]}</span><b>${d.getDate()}</b></div><div class="flex items-center gap-2 font-extrabold text-sm"><span class="material-symbols-rounded">event_busy</span>Scuole chiuse • ${lab}</div></div>`); continue; }
+                const lis = [['p', 'primo'], ['s', 'secondo'], ['c', 'contorno']].map(([c, k]) => { const dish = resolveDishForSeason(menu[k]); return `<li class="${c}"><span class="material-symbols-rounded">${dish.icon}</span><span>${dish.name}</span></li>`; }).join('');
+                items.push(`<button class="rrow" style="${past ? 'opacity:.55' : ''}" onclick="openMenuDay(${state.weekOffset}, ${i})"><div class="dbox"><span>${dayShort[i]}</span><b>${d.getDate()}</b><span>${fmtMon.format(d)}</span></div><ul>${lis}</ul><span class="material-symbols-rounded self-center text-md-textSub">chevron_right</span></button>`);
+            }
+            if (!items.length && !root.dataset.adv) { root.dataset.adv = '1'; state.weekOffset += 1; return renderHome(); }
+            const navBtn = 'm3-btn w-9 h-9 rounded-full bg-md-surfaceContainer text-md-textMain flex items-center justify-center';
+            const diff = state.weekOffset - defaultWeekOffset;
+            const relLabel = diff === 0 ? 'Questa settimana' : diff === 1 ? 'Prossima settimana' : diff === -1 ? 'Settimana scorsa' : diff > 1 ? `Tra ${diff} settimane` : `${-diff} settimane fa`;
+            const rangeTxt = `${fmtShort.format(monDate)} – ${fmtShort.format(friDate)}`;
+            html += `<div><div class="home-label justify-between"><span class="flex items-center gap-2"><span class="material-symbols-rounded text-md-primary">date_range</span>${isCurWeek ? 'Il resto della settimana' : 'Scegli la settimana'}</span><button class="m3-btn inline-flex items-center gap-1 pl-2.5 pr-3 min-h-[40px] rounded-pill bg-md-surfaceContainer text-md-textMain text-[13px] font-extrabold" onclick="openCalendar()" aria-label="Apri il calendario"><span class="material-symbols-rounded text-[20px]">calendar_month</span>Calendario</button></div>`
+                + `<div class="flex items-stretch gap-2 mb-2.5 p-1.5 rounded-[26px] bg-md-surface border border-[#FFE3C4]"><button class="m3-btn flex flex-col items-center justify-center w-16 min-h-[56px] rounded-[20px] bg-md-surfaceContainer text-md-textMain" onclick="changeCalendarWeek(-1)" aria-label="Settimana precedente"><span class="material-symbols-rounded text-[24px]">chevron_left</span><span class="text-[11px] font-extrabold leading-none">Prima</span></button>`
+                + `<div class="flex-1 flex flex-col items-center justify-center text-center min-w-0"><span class="inline-flex items-center px-2.5 py-0.5 rounded-pill text-[11px] font-extrabold ${isCurWeek ? 'bg-md-primary text-md-onPrimary' : 'bg-md-secondaryContainer text-md-onSecondaryContainer'}">${relLabel}</span><b class="font-display text-[19px] font-semibold leading-tight whitespace-nowrap mt-0.5">${rangeTxt}</b></div>`
+                + `<button class="m3-btn flex flex-col items-center justify-center w-16 min-h-[56px] rounded-[20px] bg-md-primaryContainer text-md-onPrimaryContainer" onclick="changeCalendarWeek(1)" aria-label="Settimana successiva"><span class="material-symbols-rounded text-[24px]">chevron_right</span><span class="text-[11px] font-extrabold leading-none">Dopo</span></button></div>`
+                + (isCurWeek ? '' : `<button class="m3-btn mb-2.5 w-full min-h-[48px] inline-flex items-center justify-center gap-2 rounded-pill bg-md-primary text-md-onPrimary text-sm font-extrabold" onclick="goToCurrentWeek()"><span class="material-symbols-rounded text-[20px]">undo</span>Torna a questa settimana</button>`)
+                + `<p class="px-1 -mt-0.5 mb-2.5 text-[12px] font-semibold text-md-textSub">Tocca un giorno per vedere ingredienti e valori nutrizionali.</p><div class="space-y-2.5">${items.length ? items.join('') : '<div class="hcard rest text-center font-bold text-md-textSub">Nessun altro giorno in questa settimana</div>'}</div></div>`;
+            box.innerHTML = html;
+        }
+
+        function goToCurrentWeek() {
+            state.weekOffset = defaultWeekOffset;
+            state.selectedDayIndex = initialDayIndex;
+            renderApp();
+        }
+
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(el._t);
+            el._t = setTimeout(() => el.classList.remove('show'), 2400);
+        }
+
+        function shareDay() {
+            const menu = MENU_DATA[getMenuWeekNumber(state.weekOffset)][state.selectedDayIndex];
+            const d = getDateForSlot(state.weekOffset, state.selectedDayIndex);
+            const dateTxt = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
+            const p = resolveDishForSeason(menu.primo), sec = resolveDishForSeason(menu.secondo), c = resolveDishForSeason(menu.contorno);
+            const text = `Menù mensa - ${dateTxt}\nPrimo: ${p.name}\nSecondo: ${sec.name}\nContorno: ${c.name}\nPanino, frutta di stagione e acqua`;
+            if (navigator.share) {
+                navigator.share({ title: 'Menù mensa Sorrento', text }).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => showToast('Menù copiato negli appunti'), () => showToast('Copia non riuscita'));
+            } else {
+                showToast('Condivisione non supportata da questo browser');
+            }
+        }
+
+        /* ---- Calendario ---- */
+        let calMonth = new Date(rawToday.getFullYear(), rawToday.getMonth(), 1);
+        function offsetForDate(d) { return Math.round((getMondayOfDate(d) - baseMonday) / (7 * 86400000)); }
+        function openCalendar() {
+            const sel = getDateForSlot(state.weekOffset, state.selectedDayIndex);
+            calMonth = new Date(sel.getFullYear(), sel.getMonth(), 1);
+            renderCalendar(0);
+            toggleCalendar(true);
+        }
+        function closeCalendar() { toggleCalendar(false); }
+        function calShift(n) {
+            calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + n, 1);
+            renderCalendar(n);
+        }
+        function calToday() {
+            closeCalendar();
+            if (state.viewMode === 'day') { state.weekOffset = defaultWeekOffset; state.selectedDayIndex = initialDayIndex; renderApp(); }
+            else goToCurrentWeek();
+        }
+        function pickDate(y, m, day) {
+            const d = new Date(y, m, day);
+            state.weekOffset = offsetForDate(d);
+            state.selectedDayIndex = (d.getDay() + 6) % 7;
+            closeCalendar();
+            renderApp();
+        }
+        function renderCalendar(dir) {
+            const grid = document.getElementById('calGrid');
+            const y = calMonth.getFullYear(), m = calMonth.getMonth();
+            const title = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' }).format(calMonth);
+            document.getElementById('calTitle').textContent = title;
+            document.getElementById('calHint').textContent = state.viewMode === 'day' ? 'Tocca un giorno per vederne il dettaglio' : 'Tocca un giorno per aprire quella settimana';
+            const pad = (new Date(y, m, 1).getDay() + 6) % 7;
+            const days = new Date(y, m + 1, 0).getDate();
+            let html = '';
+            const closures = [];
+            for (let i = 0; i < pad; i++) html += '<span></span>';
+            for (let day = 1; day <= days; day++) {
+                const d = new Date(y, m, day);
+                const wd = (d.getDay() + 6) % 7;
+                const weekend = wd > 4;
+                const sameWeek = !weekend && offsetForDate(d) === state.weekOffset;
+                const isSel = sameWeek && wd === state.selectedDayIndex && state.viewMode === 'day';
+                const closed = !weekend && closedLabel(d);
+                if (closed) {
+                    const last = closures[closures.length - 1];
+                    if (last && last.label === closed && (day - last.to) <= 3 && (new Date(y, m, last.to).getDay() + 6) % 7 <= 4) last.to = day;
+                    else closures.push({ from: day, to: day, label: closed });
+                }
+                const cls = ['cal-cell', sameWeek ? 'in-week' : '', closed ? 'is-closed' : '', isSel ? 'is-selected' : '', isSameCalendarDay(d, rawToday) ? 'is-today' : ''].join(' ');
+                const delay = dir === 0 ? 0 : Math.min(day * 8, 240);
+                html += `<button class="${cls} pop" style="animation-delay:${delay}ms" ${weekend ? 'disabled' : ''} ${closed ? `title="${closed}"` : ''} onclick="pickDate(${y},${m},${day})" aria-label="${day} ${title}${closed ? ' - scuole chiuse: ' + closed : ''}">${day}</button>`;
+            }
+            grid.innerHTML = html;
+            const note = document.getElementById('calClosedNote');
+            if (closures.length) {
+                document.getElementById('calClosedNoteText').textContent = 'Scuole chiuse: ' + closures.map(c => (c.from === c.to ? c.from : c.from + '–' + c.to) + ' ' + c.label).join(' • ');
+                note.classList.remove('hidden');
+            } else note.classList.add('hidden');
+            if (dir) {
+                grid.classList.remove('anim-in-right', 'anim-in-left'); void grid.offsetWidth;
+                grid.classList.add(dir > 0 ? 'anim-in-right' : 'anim-in-left');
+            }
+        }
+
+        /* ---- Ricerca piatto ---- */
+        const norm = (str) => String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        function nextOccurrence(weekNum, idx) {
+            const todayMid = new Date(rawToday.getFullYear(), rawToday.getMonth(), rawToday.getDate());
+            for (let off = 0; off < 16; off++) {
+                if (getMenuWeekNumber(off) !== weekNum) continue;
+                const d = getDateForSlot(off, idx);
+                if (d >= todayMid && !closedLabel(d)) return { off, d };
+            }
+            return null;
+        }
+        const COURSE_LABEL = { primo: 'Primo', secondo: 'Secondo', contorno: 'Contorno' };
+        function openSearch() {
+            const chips = ['Pizza', 'Pesce', 'Polpette', 'Frittata', 'Legumi', 'Riso'];
+            document.getElementById('searchChips').innerHTML = chips.map(c => `<button class="chip" onclick="setSearch('${c}')">${c}</button>`).join('');
+            const inp = document.getElementById('searchInput'); inp.value = '';
+            runSearch('');
+            toggleSearch(true);
+            setTimeout(() => inp.focus(), 350);
+        }
+        function closeSearch() { toggleSearch(false); }
+        function setSearch(q) { const inp = document.getElementById('searchInput'); inp.value = q; runSearch(q); }
+        function runSearch(q) {
+            const box = document.getElementById('searchResults');
+            const query = norm(q).trim();
+            if (query.length < 2) {
+                box.innerHTML = '<p class="text-sm text-md-textSub font-semibold px-1">Scrivi il nome di un piatto o di un ingrediente: ti mostro la prossima volta che c\'è in menù.</p>';
+                return;
+            }
+            const found = [];
+            for (let w = 1; w <= 4; w++) {
+                MENU_DATA[w].forEach((day, idx) => {
+                    ['primo', 'secondo', 'contorno'].forEach(course => {
+                        const r = resolveDishForSeason(day[course]);
+                        const hay = norm(r.name + ' ' + (r.ingredients || []).map(i => i.name + ' ' + (i.type || '')).join(' '));
+                        if (!hay.includes(query)) return;
+                        const next = nextOccurrence(w, idx);
+                        if (next) found.push({ r, course, w, next });
+                    });
+                });
+            }
+            found.sort((a, b) => a.next.d - b.next.d);
+            if (!found.length) {
+                box.innerHTML = '<p class="text-sm text-md-textSub font-semibold px-1">Nessun piatto trovato. Prova con un\'altra parola.</p>';
+                return;
+            }
+            const fmt = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+            box.innerHTML = found.slice(0, 30).map(f => `
+                <button class="search-item" onclick="pickResult(${f.next.off},${f.next.d.getDay() - 1})">
+                    <span class="material-symbols-rounded">${f.r.icon}</span>
+                    <span class="min-w-0"><b>${f.r.name}</b><small style="text-transform:capitalize">${fmt.format(f.next.d)} • ${COURSE_LABEL[f.course]} • ${f.w}ª sett.</small></span>
+                </button>`).join('');
+        }
+        function pickResult(off, idx) {
+            state.weekOffset = off;
+            state.selectedDayIndex = idx;
+            state.viewMode = 'day';
+            const ae = document.activeElement; if (ae && ae.blur) ae.blur();
+            const sh = document.getElementById('searchSheet');
+            clearTimeout(sh._t); sh.classList.remove('m3-open', 'm3-closing', 'flex'); sh.classList.add('hidden');
+            renderApp();
+            window.scrollTo(0, 0);
+        }
+
+        /* ---- Aggiungi alla schermata Home (Android + iOS) ---- */
+        const UA = navigator.userAgent || '';
+        const IS_IOS = /iphone|ipad|ipod/i.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const IS_ANDROID = /android/i.test(UA);
+        const IS_MOBILE = IS_IOS || IS_ANDROID || window.matchMedia('(pointer: coarse)').matches;
+        const IS_IOS_SAFARI = IS_IOS && /safari/i.test(UA) && !/crios|fxios|edgios|opios|duckduckgo/i.test(UA);
+        const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        const INSTALL_DISMISS_KEY = 'mensaInstallDismissed';
+        let deferredInstall = null;
+        let firstInstallView = null;
+
+        function updateInstallUI() {
+            const installed = isStandalone();
+            const btn = document.getElementById('btnInstall');
+            if (btn) btn.classList.toggle('hidden', installed);
+            let dismissed = false;
+            try { dismissed = localStorage.getItem(INSTALL_DISMISS_KEY) === '1'; } catch (e) {}
+            if (firstInstallView === null) { try { firstInstallView = !localStorage.getItem('mensaInstallSeen'); localStorage.setItem('mensaInstallSeen', '1'); } catch (e) { firstInstallView = false; } }
+            const banner = document.getElementById('installBanner');
+            if (banner) banner.classList.toggle('hidden', installed || dismissed || !IS_MOBILE || !firstInstallView);
+            const bb = document.getElementById('installBannerBtn'); if (bb) bb.textContent = IS_IOS ? 'Come fare' : 'Aggiungi';
+        }
+        function dismissInstallBanner() {
+            try { localStorage.setItem(INSTALL_DISMISS_KEY, '1'); } catch (e) {}
+            document.getElementById('installBanner').classList.add('hidden');
+        }
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); deferredInstall = e;
+            updateInstallUI();
+        });
+        window.addEventListener('appinstalled', () => {
+            deferredInstall = null;
+            updateInstallUI();
+            showToast('App aggiunta alla schermata Home');
+        });
+        function installApp() {
+            if (isStandalone()) { showToast('L\'app è già sulla schermata Home'); return; }
+            if (deferredInstall) {
+                deferredInstall.prompt();
+                deferredInstall.userChoice.finally(() => { deferredInstall = null; updateInstallUI(); });
+                return;
+            }
+            openInstallSheet();
+        }
+        function openInstallSheet() {
+            const step = (n, html, icon) => `<li class="install-step"><span class="num">${n}</span><span class="flex-1">${html}</span><span class="material-symbols-rounded">${icon}</span></li>`;
+            const ico = (name) => `<span class="material-symbols-rounded inline-ico">${name}</span>`;
+            let steps = '', sub = '', note = '';
+            if (IS_IOS) {
+                sub = 'iPhone / iPad';
+                const mock = `<li class="rounded-2xl bg-md-surfaceContainer p-3"><div class="text-[12px] font-extrabold text-md-textSub mb-2">Cos'è e dove si trova il tasto Condividi (iPhone, barra in basso di Safari):</div><div class="flex items-center justify-around rounded-2xl bg-white border border-black/10 py-2.5 px-2"><span class="material-symbols-rounded text-[24px] text-md-textSub">arrow_back_ios_new</span><span class="material-symbols-rounded text-[24px] text-md-textSub opacity-50">arrow_forward_ios</span><span class="relative inline-flex items-center justify-center w-12 h-12 rounded-full bg-md-primaryContainer ring-2 ring-[#D95A00]"><span class="material-symbols-rounded text-[28px] text-md-primary">ios_share</span></span><span class="material-symbols-rounded text-[24px] text-md-textSub">menu_book</span><span class="material-symbols-rounded text-[24px] text-md-textSub">tab</span></div><div class="text-[12px] font-bold text-md-textSub mt-2">È il quadrato con la freccia verso l'alto, al centro. Su iPad è in alto a destra.</div></li>`;
+                steps = step(1, `Apri il sito in <b>Safari</b> e tocca <b>Condividi</b> ${ico('ios_share')}`, 'ios_share') + mock
+                      + step(2, 'Scorri il menù verso l\'alto e tocca <b>“Aggiungi alla schermata Home”</b>', 'add_box')
+                      + step(3, 'Conferma con <b>“Aggiungi”</b>: l\'icona compare nella Home', 'check_circle');
+                if (!IS_IOS_SAFARI) note = 'Stai usando un altro browser: su iPhone “Aggiungi alla schermata Home” funziona da Safari. Copia l\'indirizzo e aprilo in Safari.';
+            } else if (IS_ANDROID) {
+                sub = 'Android';
+                steps = step(1, `Tocca il menu <b>⋮</b> ${ico('more_vert')} in alto a destra nel browser`, 'more_vert')
+                      + step(2, 'Scegli <b>“Installa app”</b> oppure <b>“Aggiungi a schermata Home”</b>', 'add_to_home_screen')
+                      + step(3, 'Conferma: l\'icona compare nella Home', 'check_circle');
+            } else {
+                sub = 'Computer';
+                steps = step(1, 'Cerca l\'icona <b>Installa</b> nella barra degli indirizzi del browser (Chrome o Edge)', 'install_desktop')
+                      + step(2, 'Clicca <b>“Installa”</b> e conferma', 'check_circle');
+                note = 'Per la schermata Home apri questa pagina dal telefono: su Android e su iPhone ti mostro i passaggi esatti.';
+            }
+            document.getElementById('installSub').textContent = sub;
+            document.getElementById('installSteps').innerHTML = steps;
+            const n = document.getElementById('installNote');
+            n.textContent = note; n.classList.toggle('hidden', !note);
+            toggleInstallSheet(true);
+        }
+        function closeInstallSheet() { toggleInstallSheet(false); }
+        window.addEventListener('offline', () => showToast('Sei offline'));
+        window.addEventListener('online', () => showToast('Di nuovo online'));
+
+        (function () {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const canVT = !!document.startViewTransition && !reduceMotion;
+            const $ = (id) => document.getElementById(id);
+            const restart = (el, cls) => { if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+            const KEY = 'mensaSorrentoPrefs';
+            document.documentElement.classList.remove('dark');
+            try {
+                const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+                if (['infanzia', 'primaria', 'secondaria'].includes(saved.school)) state.school = saved.school;
+                if (['winter', 'spring'].includes(saved.season)) state.season = saved.season;
+                if (typeof saved.celiachia === 'boolean') state.celiachia = saved.celiachia;
+            } catch (e) {}
+            function savePrefs() {
+                try { localStorage.setItem(KEY, JSON.stringify({ school: state.school, season: state.season, celiachia: state.celiachia })); } catch (e) {}
+            }
+            function updateHeaderContext() {
+                const labels = { infanzia: 'Infanzia', primaria: 'Primaria', secondaria: 'Secondaria' };
+                const parts = ['A.S. 2026/2027', labels[state.school], state.season === 'winter' ? 'Autunno/Inverno' : 'Primavera/Estate'];
+                if (state.celiachia) parts.push('Senza glutine');
+                const sub = $('headerSubtitle'); if (sub) sub.textContent = parts.join(' • ');
+                const dot = $('optDot'); if (dot) dot.classList.toggle('hidden', !state.celiachia);
+                const sw = $('celSwitch'); if (sw) sw.setAttribute('aria-checked', state.celiachia ? 'true' : 'false');
+            }
+            function markClosed() {
+                if (state.viewMode === 'week') {
+                    Array.from($('weekOverviewGrid').children).forEach((card, i) => {
+                        const lab = closedLabel(getDateForSlot(state.weekOffset, i));
+                        card.classList.toggle('day-closed', !!lab);
+                        if (lab) card.insertAdjacentHTML('afterbegin', `<div class="closed-chip"><span class="material-symbols-rounded">event_busy</span><span>Scuole chiuse • ${lab}</span></div>`);
+                    });
+                } else {
+                    const lab = closedLabel(getDateForSlot(state.weekOffset, state.selectedDayIndex));
+                    const b = $('closedBanner');
+                    b.classList.toggle('hidden', !lab);
+                    if (lab) $('closedBannerText').textContent = `Scuole chiuse: ${lab}. Nessun servizio mensa; il menù qui sotto è quello previsto dalla rotazione.`;
+                }
+            }
+            function renderPager() {
+                const box = $('dayPager');
+                if (!box || state.viewMode !== 'day') return;
+                const idx = state.selectedDayIndex, off = state.weekOffset;
+                const p = idx > 0 ? [off, idx - 1] : [off - 1, 4];
+                const n = idx < 4 ? [off, idx + 1] : [off + 1, 0];
+                const fmt = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: 'numeric', month: 'short' });
+                box.innerHTML = `
+                    <button class="pager-btn" onclick="stepDay(-1)" aria-label="Giorno precedente">
+                        <span class="material-symbols-rounded">arrow_back</span>
+                        <span><small>Precedente</small><b>${fmt.format(getDateForSlot(p[0], p[1]))}</b></span>
+                    </button>
+                    <button class="pager-btn next" onclick="stepDay(1)" aria-label="Giorno successivo">
+                        <span class="material-symbols-rounded">arrow_forward</span>
+                        <span><small>Successivo</small><b>${fmt.format(getDateForSlot(n[0], n[1]))}</b></span>
+                    </button>`;
+            }
+            function countUp(el, from, to, dur) {
+                if (!el || reduceMotion || isNaN(from) || isNaN(to) || from === to) return;
+                const t0 = performance.now();
+                const step = (now) => {
+                    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.round(from + (to - from) * e);
+                    if (p < 1) requestAnimationFrame(step); else el.textContent = to;
+                };
+                requestAnimationFrame(step);
+            }
+            function stagger(parent, cls, base, gap) {
+                if (!parent || reduceMotion) return;
+                Array.from(parent.children).forEach((child, i) => {
+                    child.classList.remove(cls);
+                    child.style.animationDelay = (base + i * gap) + 'ms';
+                    void child.offsetWidth;
+                    child.classList.add(cls);
+                });
+            }
+            function popIcons(root, base) {
+                if (reduceMotion || !root) return;
+                root.querySelectorAll('.material-symbols-rounded:not(.chev)').forEach((ic, i) => {
+                    ic.classList.remove('icon-pop');
+                    ic.style.animationDelay = (base + i * 60) + 'ms';
+                    void ic.offsetWidth;
+                    ic.classList.add('icon-pop');
+                });
+            }
+            function growBars() {
+                if (reduceMotion) return;
+                ['macroCarbBar', 'macroProtBar', 'macroFatBar'].forEach((id, i) => {
+                    const bar = $(id); if (!bar) return;
+                    const w = bar.style.width;
+                    bar.style.transition = 'none'; bar.style.width = '0%'; void bar.offsetWidth;
+                    bar.style.transition = '';
+                    setTimeout(() => { bar.style.width = w; }, 150 + i * 140);
+                });
+            }
+
+            let prev = { day: state.selectedDayIndex, week: state.weekOffset, view: state.viewMode, first: true };
+            let weekScroll = 0;
+            const baseRender = renderApp;
+
+            function doRender() {
+                const ordPrev = prev.week * 10 + prev.day;
+                const yBefore = window.scrollY;
+                const kOld = parseFloat(($('statKcal') || {}).textContent);
+                const gOld = parseFloat(($('statTotalGrams') || {}).textContent);
+                baseRender();
+                renderHome();
+                (function () {
+                    const diff = state.weekOffset - defaultWeekOffset;
+                    const el = $('currentWeekBadgeText'), bd = $('currentWeekBadge');
+                    if (el) el.textContent = diff === 0 ? 'Questa settimana' : diff === 1 ? 'Prossima settimana' : diff === -1 ? 'Settimana scorsa' : diff > 1 ? `Tra ${diff} settimane` : `${-diff} settimane fa`;
+                    if (bd) { bd.classList.toggle('bg-md-primary', diff === 0); bd.classList.toggle('text-md-onPrimary', diff === 0); bd.classList.toggle('bg-md-secondaryContainer', diff !== 0); bd.classList.toggle('text-md-onSecondaryContainer', diff !== 0); }
+                })();
+                updateHeaderContext();
+                markClosed();
+                renderPager();
+                savePrefs();
+                const ordNow = state.weekOffset * 10 + state.selectedDayIndex;
+                const dayChanged = ordNow !== ordPrev;
+                const weekChanged = state.weekOffset !== prev.week;
+                const viewChanged = state.viewMode !== prev.view;
+                const dirCls = ordNow >= ordPrev ? 'anim-in-right' : 'anim-in-left';
+                const grid = $('weekOverviewGrid');
+
+                if (prev.first) document.querySelector('header').classList.add('intro');
+                if (state.viewMode === 'day' && (prev.first || dayChanged || viewChanged)) {
+                    if (!prev.first && !viewChanged) restart($('heroDayCard'), dirCls);
+                    stagger($('dishesListContainer'), 'anim-rise', 80, 90);
+                    popIcons($('dishesListContainer'), 200);
+                    stagger($('dailyFixedExtras'), 'anim-rise', 360, 80);
+                    stagger($('dayStripContainer'), 'anim-pop', 0, 40);
+                    if (viewChanged || prev.first) growBars();
+                }
+                if (state.viewMode === 'week' && (prev.first || viewChanged || weekChanged)) {
+                    if (weekChanged && !prev.first) {
+                        Array.from(grid.children).forEach((c, i) => {
+                            c.classList.remove('anim-rise', 'anim-in-right', 'anim-in-left');
+                            c.style.animationDelay = (i * 70) + 'ms'; void c.offsetWidth;
+                            c.classList.add(state.weekOffset > prev.week ? 'anim-in-right' : 'anim-in-left');
+                        });
+                    } else stagger(grid, 'anim-rise', prev.first ? 250 : 60, 110);
+                    popIcons(grid, prev.first ? 350 : 150);
+                }
+                countUp($('statKcal'), kOld, parseFloat($('statKcal').textContent), 800);
+                countUp($('statTotalGrams'), gOld, parseFloat($('statTotalGrams').textContent), 800);
+                if (viewChanged && !prev.first) {
+                    if (state.viewMode === 'day') {
+                        weekScroll = yBefore;
+                        try { history.pushState({ v: 'day' }, ''); } catch (e) {}
+                        window.scrollTo({ top: 0, behavior: 'auto' });
+                    } else {
+                        window.scrollTo({ top: weekScroll, behavior: 'auto' });
+                    }
+                }
+                prev.day = state.selectedDayIndex; prev.week = state.weekOffset; prev.view = state.viewMode; prev.first = false;
+            }
+
+            renderApp = function () {
+                if (canVT && !prev.first && state.viewMode !== prev.view) {
+                    document.documentElement.classList.toggle('vt-back', state.viewMode === 'week');
+                    try { document.startViewTransition(() => doRender()); return; } catch (e) {}
+                }
+                doRender();
+            };
+
+            window.addEventListener('popstate', () => {
+                if (state.viewMode === 'day') { state.viewMode = 'week'; renderApp(); }
+            });
+
+            function animatedToggle(id, show) {
+                const el = $(id);
+                clearTimeout(el._t);
+                el.classList.remove('m3-open', 'm3-closing');
+                if (show) { el.classList.remove('hidden'); el.classList.add('flex'); void el.offsetWidth; el.classList.add('m3-open'); }
+                else if (!el.classList.contains('hidden')) {
+                    el.classList.add('m3-closing');
+                    el._t = setTimeout(() => { el.classList.remove('m3-closing', 'flex'); el.classList.add('hidden'); }, reduceMotion ? 0 : 200);
+                }
+            }
+            toggleSettingsSheet = function (show) { animatedToggle('settingsSheet', show); };
+            toggleInfoModal = function (show) { animatedToggle('infoModal', show); };
+            window.toggleCalendar = function (show) { animatedToggle('calSheet', show); };
+            window.toggleSearch = function (show) { animatedToggle('searchSheet', show); };
+            window.toggleInstallSheet = function (show) {
+                if (show && !$('settingsSheet').classList.contains('hidden')) toggleSettingsSheet(false);
+                animatedToggle('installSheet', show);
+            };
+            const SHEETS = ['settingsSheet', 'infoModal', 'calSheet', 'searchSheet', 'installSheet'];
+            const sheetOpen = () => SHEETS.some(id => !$(id).classList.contains('hidden'));
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (sheetOpen()) { toggleSettingsSheet(false); toggleInfoModal(false); closeCalendar(); closeSearch(); closeInstallSheet(); }
+                    else if (state.viewMode === 'day') setViewMode('week');
+                    return;
+                }
+                if (sheetOpen() || e.target.closest('input, textarea')) return;
+                if (e.key === 'ArrowRight') { state.viewMode === 'day' ? stepDay(1) : changeCalendarWeek(1); }
+                if (e.key === 'ArrowLeft')  { state.viewMode === 'day' ? stepDay(-1) : changeCalendarWeek(-1); }
+            });
+
+            (function () {
+                const area = $('weekViewSection'); let x0 = 0, y0 = 0;
+                area.addEventListener('touchstart', (e) => { x0 = e.changedTouches[0].screenX; y0 = e.changedTouches[0].screenY; }, { passive: true });
+                area.addEventListener('touchend', (e) => {
+                    const dx = e.changedTouches[0].screenX - x0, dy = e.changedTouches[0].screenY - y0;
+                    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) changeCalendarWeek(dx < 0 ? 1 : -1);
+                }, { passive: true });
+            })();
+
+            $('weekOverviewGrid').addEventListener('pointermove', (e) => {
+                const card = e.target.closest('.day-card');
+                if (!card) return;
+                const r = card.getBoundingClientRect();
+                card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+                card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+            }, { passive: true });
+
+            document.addEventListener('pointerdown', (e) => {
+                const btn = e.target.closest('.m3-btn');
+                if (!btn || reduceMotion) return;
+                const r = btn.getBoundingClientRect(), size = Math.max(r.width, r.height) * 2;
+                const dot = document.createElement('span');
+                dot.className = 'm3-ripple';
+                dot.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - r.left - size / 2}px;top:${e.clientY - r.top - size / 2}px`;
+                btn.appendChild(dot);
+                setTimeout(() => dot.remove(), 650);
+            }, { passive: true });
+
+            const topBtn = $('btnTop'), headerEl = document.querySelector('header'); let ticking = false;
+            function onScroll() {
+                ticking = false;
+                const scrolled = window.scrollY > 320;
+                topBtn.classList.toggle('show', scrolled);
+                topBtn.tabIndex = scrolled ? 0 : -1;
+                headerEl.classList.toggle('scrolled', window.scrollY > 8);
+            }
+            window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+            onScroll();
+            updateInstallUI();
+        })();
+
+        // Gestione Swipe Touch Sinistra/Destra sulla scheda del giorno per cambiare giorno su smartphone
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        window.onload = function () {
+            const heroCard = document.getElementById('heroDayCard');
+            heroCard.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            heroCard.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const diffX = touchEndX - touchStartX;
+                if (Math.abs(diffX) > 60) {
+                    if (diffX < 0) stepDay(1);  // Swipe a sinistra -> Giorno successivo
+                    else stepDay(-1);           // Swipe a destra -> Giorno precedente
+                }
+            }, { passive: true });
+
+            renderApp();
+        };
+    </script>
+</body>
+</html>
